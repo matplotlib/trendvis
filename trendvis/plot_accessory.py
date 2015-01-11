@@ -103,7 +103,38 @@ def set_xticks(axis, xticks, xcolor, majordim, minordim, tick_direction,
     axis.tick_params(labelsize=labelsize, pad=pad)
 
 
-def reorder_sort(reorder, to_sort):
+def reordering(reorder, ratios, ticks, labels, axis_shift, to_twin, reverse_ax,
+               bar_location, limits):
+    """
+    """
+    plotdata = reorder_bysort(reorder, plotdata)
+    ratios = reorder_bysort(reorder, ratios)
+    ticks = reorder_bysort(reorder, ticks)
+    labels = reorder_bysort(reorder, labels)
+
+    if axis_shift is not None:
+        axis_shift = reorder_bysort(reorder, axis_shift)
+
+    if to_twin is not None:
+        to_twin = reorder_byindex(reorder, to_twin)
+    if reverse_ax is not None:
+        reverse_ax = reorder_byindex(reorder, reverse_ax)
+    if bar_location is not None:
+        bar_location = reorder_byindex(reorder, bar_location)
+
+    if limits is not None:
+        re_limits = []:
+        for lim in limits:
+            re_limits.append((reorder.index(lim[0]), lim[1], lim[2]))
+
+        limits = re_limits
+
+    return (plotdata, ratios, ticks, labels, axis_shift, to_twin, reverse_ax,
+            bar_location, limits)
+
+
+
+def reorder_bysort(reorder, to_sort):
     """
     Reorder a list of items
 
@@ -128,7 +159,7 @@ def reorder_sort(reorder, to_sort):
     return re_sort
 
 
-def reorder_index(reorder, to_sort):
+def reorder_byindex(reorder, to_sort):
     """
     Change a variable-length list of indices referencing a 0-n order
         to a list of new indices referencing a different order.

@@ -4,15 +4,15 @@ import draw
 import plot_accessory as pa
 
 def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
-             xlabels, ylabels, xticks, yticks, dpi=80, reverse_y=None,
-             reverse_x=False, ylimits=None, startside='left',
-             alternate_sides=True, yaxis_shift=None, spinewidth=3,
-             black_spines=False, use_lastcolor=False,
+             xlabels, ylabels, xticks, yticks, line_kwargs={}, reverse_y=None,
+             reverse_x=False, ylimits=None,
+             startside='left', alternate_sides=True, yaxis_shift=None,
+             spinewidth=3, black_spines=False, use_lastcolor=False,
              majortick_dim=(15,5), minortick_dim=(6,3),
              tick_direction=('out', 'out'), ticklabel_formatter='%d',
              rows_to_twin=None, twins_behind=True, shift_twinnedax=0.2,
-             draw_frame=(False, 3), draw_cutout=(True, 0.015),
-             draw_bars=None, bar_loc=None, draw_columns=None,
+             reorder=None, draw_frame=(False, 3), draw_cutout=(True, 0.015),
+             draw_bars=None, bar_location=None, draw_columns=None,
              col_loc=None, draw_rectangles=None):
     """
     Creates a figure with multiple y-axes stacked over a broken x-axis.
@@ -34,12 +34,14 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
     xlimits : tuple of floats or ints
         Forced limits on the x axis.
     plotdata : list of list of tuples
-        (x, y, color, linewidth, linestyle, marker, optional column number)
-        One sublist per y-axis (including twin axes).  Each tuple has trace
-        and formatting options.  The first tuple in each sublist determines
-        axis spine color, unless use_lastcolor=True or black_spines=True.
-    xlabel : string
-        The x-axis label
+        (x, y, color, kwarg dictionary, optional list of ints).
+        One sublist per y-axis (including twin axes).  The first tuple in each
+        sublist determines axis spine color, unless use_lastcolor=True or
+        black_spines=True.  The optional list of ints can be used to indicate
+        a specific column to plot in.  If not provided, the data will be
+        plotted in all columns.
+    xlabels : string
+        The x-axis labels.  Change so can just do one or one for each column.
     ylabels : list of strings
         The labels of each of the y-axes, including twins.
     xticks : tuple of floats or ints
@@ -50,8 +52,13 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
 
     Keyword Arguments
     -----------------
-    dpi : int
-        Default 80.  Resolution of the figure
+    line_kwargs : dictionary
+        Default {}.  Addendums/changes to default line formatting dictionary:
+        {'marker' : 'o',
+         'ls' : '-',
+         'markeredgecolor' : 'none',
+         'zorder' : 10,
+         'lw' : spinewidth-1}
     reverse_y : list of ints
         Default None.  List of indices indicating y-axes to invert.
     reverse_x : Boolean
@@ -67,8 +74,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
         will be located on startside (except for twins).
     yaxis_shift : list of floats
         Default None.  The percentage of figure size to shift the original
-        y-axes from the left or right of the normal position.
-        len(yaxis_shift) == len(yratios)
+        y-axes out from normal position.  len(yaxis_shift) == len(yratios)
     spinewidth : int
         Default 3.  The width of the axis spines.
     black_spines : Boolean
@@ -104,10 +110,10 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
         Default True.  [True|False].  draw_cutout[1] = length.
         Draw diagonal break lines at each x-axis break.
     draw_bars : list of tuples of (min, max, color, optional alpha)
-        Default None.  Draw horizontal bars across a row (given in bar_loc)
-    bar_loc : list of ints
+        Default None.  Draw horizontal bars across a row (given in bar_location)
+    bar_location : list of ints
         Default None.  Row locations of the bars defined in draw_bars.
-        len(draw_bars) == len(bar_loc)
+        len(draw_bars) == len(bar_location)
     draw_columns : list of tuples of (min, max, color, optional alpha)
         Default None.  Draw vertical bars across a column (given in col_loc)
     col_loc : list of ints
@@ -115,22 +121,29 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
     draw_rectangles :
         Default None.
 
+    Returns
+    -------
+    fig : figure instance
+        The figure
+    axes : list of axes instances
+        The axes of the figure `fig`
+
     """
 
     # Create figure
     fig = plt.figure(figsize=figsize)
 
     spine_begone = {'top'   : {'left' : ['bottom', 'right'],
-                           'right': ['bottom', 'left'],
-                           'none' : ['bottom', 'left', 'right']},
-                'none'  : {'left' : ['top', 'bottom', 'right'],
-                           'right': ['top', 'bottom', 'left'],
-                           'none' : ['top', 'bottom', 'left', 'right']},
-                'bottom': {'left' : ['top', 'right'],
-                           'right': ['top', 'left'],
-                           'none' : ['top', 'left', 'right']},
-                'both'  : {'left' : ['right'],
-                           'right': ['left']}}
+                               'right': ['bottom', 'left'],
+                               'none' : ['bottom', 'left', 'right']},
+                    'none'  : {'left' : ['top', 'bottom', 'right'],
+                               'right': ['top', 'bottom', 'left'],
+                               'none' : ['top', 'bottom', 'left', 'right']},
+                    'bottom': {'left' : ['top', 'right'],
+                               'right': ['top', 'left'],
+                               'none' : ['top', 'left', 'right']},
+                    'both'  : {'left' : ['right'],
+                               'right': ['left']}}
 
     xtick_labels = {'top' : ('on', 'off'),
                     'both' : ('on', 'on'),
@@ -142,6 +155,14 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
 
     side_inds = {'left' : 0,
                  'right': -1}
+
+    default_linekwargs = {'marker' : 'o',
+                          'ls' : '-',
+                          'markeredgecolor' : 'none',
+                          'zorder' : 10,
+                          'lw' : spinewidth-1}
+
+    default_linekwargs.update(line_kwargs)
 
     ypos = 0
     xpos = 0
@@ -156,40 +177,22 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
         if len(reorder) != numrows:
             raise ValueError('`reorder` length must equal `yratios` length')
 
-        plotdata = pa.reorder_sort(reorder, plotdata)
-        yratios = pa.reorder_sort(reorder, yratios)
-        yticks = pa.reorder_sort(reorder, yticks)
-        ylabels = pa.reorder_sort(reorder, ylabels)
-        if yaxis_shift is not None:
-            yaxis_shift = pa.reorder_sort(reorder, yaxis_shift)
-
-        if rows_to_twin is not None:
-            rows_to_twin = pa.reorder_index(reorder, rows_to_twin)
-        if reverse_y is not None:
-            reverse_y = pa.reorder_index(reorder, reverse_y)
-        if bar_loc is not None:
-            bar_loc = pa.reorder_index(reorder, bar_loc)
-
-        if ylimits is not None:
-            re_ylimits = []
-            for y in ylimits:
-                re_ylimits.append((reorder.index[y[0]], y[1], y[2]))
+        (plotdata, yratios, yticks, ylabels, yaxis_shift,
+            rows_to_twin, reverse_y, bar_location,
+            ylimits) = pa.reordering(reorder, plotdata, yratios, yticks,
+                                     ylabels, yaxis_shift, rows_to_twin,
+                                     reverse_y, bar_location, ylimits)
 
     if reverse_x:
         xratios = xratios[::-1]
         xlimits = [xl[::-1] for xl in xlimits][::-1]
 
-        new_column_order = range(0, numcols)[::-1]
-        for row in plotdata:
-            for plot in plotdata:
-                try:
-                    # check if plot is a list or tuple
-                    plot[6] = new_column_order[plot[6]]
-                except:
-                    pass
+        column_order = range(0, numcols)[::-1]
         if col_loc is not None:
             for ind, cl in enumerate(col_loc):
-                col_loc[ind] = new_column_order[ind]
+                col_loc[ind] = column_order[ind]
+    else:
+        column_order = range(0, numcols)
 
 
     # Initialize axes and put in nested lists
@@ -232,7 +235,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
                 newside = alt_sides[side_list[i-1]]
                 side_list.append(newside)
         else:
-            side_list = [startside]*totalrows
+            side_list = [startside]*numrows
 
     if yaxis_shift is None:
         axshifts = [0.0]*numrows
@@ -285,11 +288,11 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
             # Set x labels and format ticks
             if pos != 'none':
                 set_xticks()
-                ax.set_xlabel(xlabel, fontsize=20, labelpad=15)
-                if p!= 'bottom':
+                ax.set_xlabel(xlabels, fontsize=20, labelpad=15)
+                if pos != 'bottom':
                     ax.spines['top'].set_linewidth(spinewidth)
                     ax.xaxis.set_label_position('top')
-                if p != 'top':
+                if pos != 'top':
                     ax.spines['bottom'].set_linewidth(spinewidth)
 
         # Find the y axis color
@@ -307,8 +310,8 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
         # Get that axis, set y ticks
         data_ax = row.pop(data_ind)
         data_ax.set_yticks()
-        data_ax.spines[dataside].set_position(('axes', shift))
-        data_ax.yaxis.set_ticks_position(dataside)
+        data_ax.spines[side].set_position(('axes', shift))
+        data_ax.yaxis.set_ticks_position(side)
 
         # Set colors and linewidths
         data_ax.spines[side].set_color(ycolor)
@@ -325,7 +328,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
         for sp in spine_begone[pos][side]:
             data_ax.spines[sp].set_visible(False)
 
-        # For the other axes int he row, set the y spines
+        # For the other axes in the row, set the y spines
         # and necessary x spine(s) invisible, get rid of y ticks
         for ax in row:
             ax.yaxis.set_ticks_position('none')
@@ -351,22 +354,19 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
         for rev_y in reverse_y:
             axes[rev_y][0].invert_yaxis()
 
-    for row, data in zip(axes, plotdata):
-        for d in data:
-            for colnum, ax in enumerate(row):
-                try:
-                    # Check if a colnum is specified, and if so, if it
-                    # matches the current colnum
-                    if p[6] == colnum:
-                        ax.plot(d[0], d[1], marker=d[5], color=d[2],
-                                linewidth=d[3], linestyle=d[4],
-                                zorder=10, markeredgecolor='none')
-                    # else do nothing
-                except:
-                    # No colnum specified
-                    ax.plot(d[0], d[1], marker=d[5], color=d[2],
-                            linewidth=d[3], linestyle=d[4],
-                            zorder=10, markeredgecolor='none')
+    for row, rowdata in zip(axes, plotdata):
+        for data in rowdata:
+            kwargs = default_linekwargs.copy()
+            kwargs.update(data[3])
+
+            try:
+                for col in data[4]:
+                    col_ind = column_order[col]
+                    row[col_ind].errorbar(data[0], data[1], color=data[2],
+                                          **kwargs)
+            except:
+                for ax in row:
+                    ax.errorbar(data[0], data[1], color=data[2], **kwargs)
 
     plt.subplots_adjust(hspace=plotspacing)
 
@@ -384,7 +384,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
                      col_settings, True)
 
     if draw_bars is not None:
-        for bar_settings, rownum in zip(draw_bars, bar_loc):
+        for bar_settings, rownum in zip(draw_bars, bar_location):
             draw.bar(fig, axes[rownum][0], axes[rownum][-1],
                      bar_settings, False)
 

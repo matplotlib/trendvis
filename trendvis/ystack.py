@@ -3,16 +3,16 @@ import matplotlib.pyplot as plt
 import draw
 import plot_accessory as pa
 
-def multi_y(figsize, plotspacing, plot_sizeratios, xlimits,
-            plotdata, xlabel, ylabels, xticks, yticks, dpi=80, reverse_y=None,
+def multi_y(figsize, plotspacing, yratios, xlimits, plotdata,
+            xlabel, ylabels, xticks, yticks, line_kwargs={}, reverse_y=None,
             reverse_x=False, ylimits=None, startside='left',
-            alternate_sides=True, spinewidth=3, black_spines=False,
-            use_lastcolor=False, majortick_dim=(15,5), minortick_dim=(6,3),
+            alternate_sides=True, yaxis_shift=None, spinewidth=3,
+            black_spines=False, use_lastcolor=False,
+            majortick_dim=(15,5), minortick_dim=(6,3),
             tick_direction=('out', 'out'), ticklabel_formatter='%d',
             axes_to_twin=None, twins_behind=True, shift_twinnedax=0.2,
-            remove_extraspines=True, reorder=None, draw_frame=(False, 3),
-            draw_bars=None, bar_loc=None, draw_columns=None,
-            draw_rectangles=None):
+            reorder=None, draw_frame=(False, 3), draw_bars=None,
+            bar_location=None, draw_columns=None, draw_rectangles=None):
     """
     Creates a figure with multiple y-axes stacked over one x-axis such that
         the data all appears to be in one plotspace.
@@ -24,7 +24,7 @@ def multi_y(figsize, plotspacing, plot_sizeratios, xlimits,
     plotspacing
         Sets the vertical spacing between rows.  -0.35 recommended.
         If all the y-axes on one side (alternate_sides=False), >= 0.0
-    plot_sizeratios : list of ints
+    yratios : list of ints
         The relative sizes of the desired subplots.  Each subplot box may
         have multiple traces and/or two y-axes (twins).
     xlimits : tuple of floats or ints
@@ -46,8 +46,6 @@ def multi_y(figsize, plotspacing, plot_sizeratios, xlimits,
 
     Keyword Arguments
     -----------------
-    dpi : int
-        Default 80.  Resolution of the figure
     reverse_y : list of ints
         Default None.  A list of indices indicating which y-axes to invert.
     reverse_x : Boolean
@@ -94,10 +92,10 @@ def multi_y(figsize, plotspacing, plot_sizeratios, xlimits,
         axes, visually anchoring the spines to a frame.  If False,
         the spines will appear to be floating.  linewidth=draw_frame[1]
     draw_bars : list of tuples of (min, max, color, optional alpha)
-        Default None.  Draw horizontal bars across a row (given in bar_loc)
-    bar_loc : list of ints
+        Default None.  Draw horizontal bars across a row (given in bar_location)
+    bar_location : list of ints
         Default None.  Row locations of the bars defined in draw_bars.
-        len(draw_bars) == len(bar_loc)
+        len(draw_bars) == len(bar_location)
     draw_columns : list of tuples of (min, max, color, optional alpha)
         Default None.  Draw vertical bars across the plot space.
     draw_rectangles :
@@ -113,26 +111,7 @@ def multi_y(figsize, plotspacing, plot_sizeratios, xlimits,
     """
 
     # Create figure
-    fig = plt.figure(figsize=figsize, dpi=dpi)
-
-    # Initialize subplot row position, total grid rows, and axes list
-    i = 0
-    totalrows = sum(plot_sizeratios)
-    axes = []
-
-    # Make subplot grid and get list of axes
-    for r in plot_sizeratios:
-
-        ax = plt.subplot2grid((totalrows,1), (i,0), rowspan=r)
-        axes.append(ax)
-
-        i += r
-
-    # Initialize starting y-axis side, number of subplots, lists
-    side = startside
-    subplotnum = len(plot_sizeratios)
-    pos_list = []
-    side_list = []
+    fig = plt.figure(figsize=figsize)
 
     # Initialize dictionary of the spines to remove
     # Based on axis position in subplot grid and y-axis location
@@ -145,191 +124,190 @@ def multi_y(figsize, plotspacing, plot_sizeratios, xlimits,
                     'both'  : {'left'  : ['right'],
                                'right' : ['left'] }}
 
-    # Set ticks positions and get rid of extraneous spines
-    # (remove_extraspines=True)
-    for j in range (0, subplotnum):
+    xtick_labels = {'top' : ('on', 'off'),
+                    'both' : ('on', 'on'),
+                    'bottom' : ('off', 'on'),
+                    'none' : ('off', 'off')}
 
-        # Find subplot position- plots are top to bottom.
-        if j == 0 and subplotnum > 1:
-            pos = 'top'
-        elif j == 0 and subplotnum == 1:
-            pos = 'both'
-        elif j == subplotnum - 1:
-            pos = 'bottom'
-        else:
-            pos = 'none'
+    alt_sides = {'left' : 'right',
+                 'right': 'left'}
 
-        # Put subplot position and side of y-axis into a plot
-        pos_list.append(pos)
-        side_list.append(side)
+    default_linekwargs = {'marker' : 'o',
+                          'ls' : '-',
+                          'markeredgecolor' : 'none',
+                          'zorder' : 10,
+                          'lw' : spinewidth-1}
 
-        # Set the x and y axis ticks, set the background invisible
-        axes[j].xaxis.set_ticks_position(pos)
-        axes[j].yaxis.set_ticks_position(side)
+    default_kwargs.update(line_kwargs)
 
-        axes[j].patch.set_visible(False)
+    # Initialize subplot row position, total grid rows, and axes list
+    ypos = 0
+    gridrows = sum(yratios)
+    numrows = len(yratios)
+    axes = []
 
-        # Switch labels of top subplot to top x axis
-        if pos == 'top':
-            axes[j].xaxis.set_tick_params(labeltop='on', labelbottom='off')
-        elif pos == 'both':
-            axes[j].xaxis.set_tick_params(labeltop='on', labelbottom='on')
+    if reorder is not None:
+        if len(reorder) != numrows:
+            raise ValueError('len(`reorder`) != len(`yratios`)')
 
-        # Get rid of extraneous spines unless remove_extraspines=True
-        for sp in spine_begone[pos][side]:
-            if remove_extraspines:
-                axes[j].spines[sp].set_visible(False)
+        (plotdata, yratios, yticks, ylabels, yaxis_shift,
+            axes_to_twin, reverse_y, bar_location,
+            ylimits) = pa.reordering(reorder, plotdata, yratios, yticks,
+                                     ylabels, yaxis_shift, axes_to_twin,
+                                     reverse_y, bar_location, ylimits)
 
-            # Remove ticklabels from extra bottom spines
-            if sp == 'bottom' and j != 0:
-                plt.setp(axes[j].get_xticklabels(), visible=False)
+    # Make subplot grid and get list of axes
+    for rowspan in yratios:
+        sharex=None
+
+        if ypos > 0:
+            sharex = axes[0]
+
+        ax = plt.subplot2grid((gridrows,1), (ypos,0), rowspan=rowspan,
+                              sharex=sharex)
+        axes.append(ax)
+        ypos += rowspan
+
+    # Make position and side lists for original axes
+    if numrows == 1:
+        pos_list = ['both']
+        side_list = [startside]
+    else:
+        nonerows = numrows - 2
+        post_list = ['top'] + ['none']*nonerows + ['bottom']
 
         if alternate_sides:
-            # Switch sides
-            if side == 'left':
-                side = 'right'
-            else:
-                side = 'left'
+            side_list = [startside]
+            for i in range(1, numrows):
+                newside = alt_sides[side_list[i-1]]
+                side_list.append(newside)
+        else:
+            side_list = [startside]*numrows
 
-    # Check for y-axis twinning
+    if yaxis_shift is None:
+        axshifts = [0.0]*numrows
+    else:
+        axshifts = yaxis_shift
+
     if axes_to_twin is not None:
-        # Twinned axes creation
-        for x in axes_to_twin:
-
-            # Get the side of the original y-axis
-            side = axes[x].yaxis.get_ticks_position()
-
-            # Twin, turn on box around new axes, set the background invisible
-            # axes[x].invert_xaxis()
-            ax = axes[x].twinx()
-            ax.set_frame_on(True)
-            ax.patch.set_visible(False)
-
-            # Set the side of the new twin, if necessary shifting ticks position
-            # Set the amount to shift the new y axis relative to the figure
-            if side == 'left':
-                side = 'right'
-                shift = 1 + shift_twinnedax
-            else:
-                axes[x].yaxis.set_ticks_position(side)
-                side = 'left'
-                shift = 0 - shift_twinnedax
-                ax.yaxis.set_ticks_position(side)
-
-            twin_pos = 'none'
-
-            # Get rid of extraneous spines, remove x tick labels from view
-            for sp in spine_begone[twin_pos][side]:
-                if remove_extraspines:
-                    ax.spines[sp].set_visible(False)
-
-            plt.setp(ax.get_xticklabels(), visible=False)
-
-            # Move the spine of the y axis
-            ax.spines[side].set_position(('axes', shift))
-
-            # Put the new axes instance and position information into lists
-            axes.append(ax)
-            side_list.append(side)
-            pos_list.append(twin_pos)
+        for ind in axes_to_twin:
+            twin = axes[ind].twinx()
 
             if twins_behind:
-                axes[x].set_zorder(ax.get_zorder()+1)
+                axes[ind].set_zorder(twin.get_zorder()+1)
 
-    # Order of plots is determined by order of plotdata.
-    # Easily shuffle plots using reorder
-    # If reorder is None, then reorder will be set to the original order
-    if reorder is None:
-        reorder = range(0, len(plotdata))
 
-    # Given list of lists of records
-    # One sublist per axis
+            twinside = alt_sides[side_list[ind]]
 
-    # Format axes and ticks
-    for m, x, p, s in zip(reorder, axes, pos_list, side_list):
+            side_list.append(twinside)
+            pos_list.append('none')
+            axes.append(twin)
 
-        # Set xlimits
-        if reverse_x:
-            x.set_xlim(xlimits[1], xlimits[0])
+        try:
+            axshifts.extend(shift_twinnedax)
+        except:
+            axshifts.extend([shift_twinnedax]*len(axes_to_twin))
+
+    for s, (shift, side) in enumerate(zip(axshifts, side_list)):
+        if side is 'left':
+            axshifts[s] = 0 - shift
         else:
-            x.set_xlim(xlimits[0], xlimits[1])
+            axshifts[s] = 1 + shift
 
-        # Get the axis color info
+    for i, (ax, side, pos, shift, ylabel) in enumerate(zip(axes, side_list,
+                                                           pos_list, axshifts,
+                                                           ylabels)):
+        ltop, lbottom = xtick_labels[pos]
+        # Take care of the x tick visibility and position
+        ax.xaxis.set_tick_params(labeltop=ltop, labelbottom=lbottom)
+        ax.xaxis.set_ticks_position(pos)
+
+        ax.patch.set_visible(False)
+
+        if pos != 'none':
+            pa.set_xticks(ax, xticks, 'black', majortick_dim, minortick_dim,
+                          tick_direction, 16, 10)
+            ax.set_xlabel(xlabel, fontsize=20, labelpad=15)
+
+            if pos != 'bottom':
+                ax.spines['top'].set_linewidth(spinewidth)
+                ax.xaxis.set_label_position('top')
+            if pos != 'top':
+                ax.spines['bottom'].set_linewidth(spinewidth)
+
         if black_spines:
-            ycolor ='black'
+            ycolor = 'black'
         else:
             if use_lastcolor:
-                ycolor = plotdata[m][-1][2]
+                ycolor = plotdata[i][-1][2]
             else:
-                ycolor = plotdata[m][0][2]
+                ycolor = plotdata[i][0][2]
 
-        # Set tick parameters
-        pa.set_ticks(x, xticks, yticks[m], 'black', ycolor,
-                     majortick_dim, minortick_dim, tick_direction, 16, 10,
-                     ticklabel_formatter)
+        # Set ytick parameters and position
+        # Set y-axis position
+        ax.set_yticks(ax, yticks, ycolor, majortick_dim, minortick_dim,
+                      tick_direction, 16, 10)
+        ax.spines[side].set_position(('axes', shift))
+        ax.yaxis.set_ticks_position(side)
 
-        # Set the color, linewidth, label position, and label of each y axis
-        x.spines[s].set_color(ycolor)
-        x.spines[s].set_linewidth(spinewidth)
-        x.yaxis.set_label_position(s)
+        # Set colors and linewidths
+        ax.spines[side].set_color(ycolor)
+        ax.spines[side].set_linewidth(spinewidth)
+        ax.spines[side].set_label_position(side)
 
-        if s == 'right':
-            x.set_ylabel(ylabels[m], fontsize=18, labelpad=12,
-                         rotation=270, verticalalignment='bottom')
+        # Set ylabel parameters
+        if side == 'right':
+            ax.set_ylabel(ylabel, fontsize=18, labelpad=12, rotation=270,
+                          verticalalignment='bottom')
         else:
-            x.set_ylabel(ylabels[m], fontsize=18, labelpad=12)
+            ax.set_ylabel(ylabel, fontsize=18, labelpad=12)
 
-        # If the axis belongs to the top or bottom subplot, set the x axis
-        # linewidth, label, and label position
-        if p != 'none':
-            x.set_xlabel(xlabel, fontsize=20, labelpad=15)
+        # Get rid of remaining spines
+        for sp in spine_begone[pos][side]:
+            ax.spines[sp].set_visible(False)
 
-            if p != 'bottom':
-                x.spines['top'].set_linewidth(spinewidth)
-                x.xaxis.set_label_position('top')
-            if p != 'top':
-                x.spines['bottom'].set_linewidth(spinewidth)
-                x.xaxis.set_label_position('bottom')
+    if xlimits is not None:
+        axes[0].set_xlim(xlimits[0], xlimits[1])
 
+    if reverse_x:
+        axes[0].invert_xaxis()
 
-    # Set ylimits for axes that have specified ylimits
     if ylimits is not None:
         for ylimit in ylimits:
-            axes[reorder.index(ylimit[0])].set_ylim(ylimit[1], ylimit[2])
-
-    # Plot data
-    # Later- add functionality for errorbars
-    for x, m in zip(axes, reorder):
-
-        pd = plotdata[m]
-
-        # Tuples are (x, y, color, lw, ls, marker)
-        for p in pd:
-            x.plot(p[0], p[1], marker=p[5], color=p[2], linewidth=p[3],
-                   linestyle=p[4], zorder=10, markeredgecolor='none')
+            axes[ylimit[0]].set_ylim(ylimit[1], ylimit[2])
 
     if reverse_y is not None:
-        for rev in reverse_y:
-            axes[reorder.index(rev)].invert_yaxis()
+        for rev_y in reverse_y:
+            axes[rev_y].invert_yaxis()
+
+    # Plot data
+    for ax, pd in zip(axes, plotdata):
+
+        # Tuples are (x, y, color, kwargs)
+        for p in pd:
+
+            kwargs = default_linekwargs.copy()
+            kwargs.update(p[3])
+
+            x.errorbar(p[0], p[1], color=p[2], **kwargs)
+
+    # Alter the spacing between subplots (to pretend this is one giant plot)
+    # Must be done before drawing the horizontal bars
+    plt.subplots_adjust(hspace=plotspacing)
 
     if draw_frame[0]:
-        lowax = subplotnum-1
+        lowax = numrows-1
         draw.frame(fig, axes[lowax], axes[0], draw_frame[1])
 
     if draw_columns is not None:
-        lowax = subplotnum-1
+        lowax = numrows-1
         for dc in draw_columns:
             draw.bar(fig, axes[lowax], axes[0], dc, True)
 
-    # Alter the spacing between subplots (to pretend this is one giant plot)
-    plt.subplots_adjust(hspace=plotspacing)
-
-    # Draw horizontal bars and all rectangles, which will not move with hspace
+    # Draw horizontal bars
     if draw_bars is not None:
-        for bar_set, bar_ax in zip(draw_bars, bar_loc):
-            draw_ax = axes[reorder.index(bar_ax)]
-        # draw.bar(fig, axes[0], axes[rightax], draw_bars, False)
+        for bar_set, bar_ax in zip(draw_bars, bar_location):
+            draw_ax = axes[bar_ax]
             draw.bar(fig, draw_ax, draw_ax, bar_set, False)
-
 
     return fig, axes
