@@ -1,15 +1,29 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import draw
-import plot_accessory as pa
+
 
 class Grid(object):
     """
-    Mother class to help set up grid.
+    Superlass for Y_Grid, X_Grid.
 
     """
 
     def __init__(self, xratios, yratios, mainax_x):
+        """
+        Initialize grid attributes
+
+        Parameters
+        ----------
+        xratios : int or list of ints
+            The relative sizes of the columns.  Not directly comparable
+            to yratios.
+        yratios : int or list of ints
+            The relative sizes of the rows.  Not directly comparable to xratios.
+        mainax_x : Boolean
+            [True|False].  Indicates if x is the main axis.  Determines
+            some attributes
+
+        """
 
         self.gridrows, self.yratios = _ratios_arelists(yratios)
         self.gridcols, self.xratios = _ratios_arelists(xratios)
@@ -18,6 +32,9 @@ class Grid(object):
         self.numcols = len(self.xratios)
 
         self.axes = []
+
+        self.relative_shifts = None
+        self.stack_shifts = None
 
         if mainax_x:
             self.mainax_id = 'x'
@@ -49,7 +66,7 @@ class Grid(object):
                                              'none' : ['top', 'left', 'right']},
                                  'both' : {'left' : ['right'],
                                            'right': ['left'],
-                                           'none' : ['right', 'left']}})}
+                                           'none' : ['right', 'left']}}
         else:
             self.mainax_id = 'y'
             self.stackax_id = 'x'
@@ -83,54 +100,20 @@ class Grid(object):
                                            'none' : ['top', 'bottom']}}
 
 
-    def set_relative_axshift(self, axis_shift=None):
-        """
-        Set universal stacked axis spine shift by providing a float
-        Set individual axis spine shift by providing a list of floats where
-            len(axis_shift) = stackdim
-        """
-
-
-        if axis_shift is None:
-            self.stackax_relshifts = None
-            self.stack_shifts = None
-
-        else:
-            try:
-                # Check if iterable
-                axis_shift[0]
-            except:
-                # if not a list, apply same shift to both
-                self.stackax_relshifts = [axis_shift] * stackdim
-            else:
-                if len(axis_shift) != stackdim:
-                    print 'Warning:  len(axis_shift) != ' + stackdim
-                    self.stackax_relshifts = [axis_shift[0]] * stackdim
-                else:
-                    self.stackax_relshifts = axis_shift
-
-            self.stack_shifts = []
-
-
-    def set_absolute_axshift(self):
-        """
-        Set the stacked axes shifts for realz
-
-        """
-
-        if self.stack_shifts is not None:
-            for shift, dataside in zip(self.stackax_relshifts,
-                                       self.dataside_list):
-                if dataside is 'bottom' or dataside is 'left':
-                    self.stack_shifts.append(0 - shift)
-                else:
-                    self.stack_shifts.append(1 + shift)
-
-
     def set_dataside(self, startside, alternate_sides):
         """
         Set the dataside_list that indicates which stacked ax spine will be
-            the data spine
+            the data spine.
+
+        Parameters
+        ----------
+        startside : string
+            ['left'|'right'] or ['top'|'bottom'].  The side the first row
+            (column) in self.axes will have its y (x) axis spine on.
+        alternate_sides : Boolean
+            [True|False].  Stacked axis spines alternate sides or are all on
+            startside.
+
         """
 
         self.dataside_list = [startside]
@@ -146,14 +129,22 @@ class Grid(object):
 
     def set_stackposition(self, onespine_forboth):
         """
-        set the stackpos_list that indicates where the row or col is
-            in the stack
+        Set the stackpos_list that indicates where the row or col is
+            in the grid
+
+        Parameters
+        ----------
+        onespine_forboth : Boolean
+            [True|False].  If the plot stack is only 1 row (column), then
+            both main axis spines may be used (False), or only the bottom (left)
+            spine.
 
         """
 
         alt_pos = {'left' : 'right',
                    'top' : 'bottom'}
 
+        # Position list in the case of a stack of 1
         if self.stackdim == 1:
             if onespine_forboth:
                 self.stackpos_list = [self.startpos]
@@ -162,8 +153,131 @@ class Grid(object):
 
         else:
             num_nones = self.stackdim - 2
-            self.stackpos_list = ([startpos] +['none']*num_nones +
-                                  [alt_pos[startpos]])
+            self.stackpos_list = ([self.startpos] +['none']*num_nones +
+                                  [alt_pos[self.startpos]])
+
+
+    def set_relative_axshift(self, axis_shift=None):
+        """
+        Set universal or individual stacked axis spine relative shift
+
+        Keyword Arguments
+        -----------------
+        axis_shift : float or list of floats
+            Default None.  Set universal (float) or individual (list of
+                floats where len(axis_shift) = self.stackdim) axis spine shift
+
+        """
+
+        if axis_shift is not None:
+            try:
+                # Check if iterable
+                axis_shift[0]
+            except:
+                # if not a list, apply same shift to both
+                self.relative_shifts = [axis_shift] * self.stackdim
+            else:
+                if len(axis_shift) != self.stackdim:
+                    print 'Warning:  len(axis_shift) != ' + self.stackdim
+                    self.relative_shifts = [axis_shift[0]] * self.stackdim
+                else:
+                    self.relative_shifts = axis_shift
+
+
+
+    def set_absolute_axshift(self):
+        """
+        Translate self.relative_shifts to absolute values based on the
+            corresponding plot side the axis will appear on
+
+        """
+
+        if self.relative_shifts is not None:
+
+            # Reset aboslute shifts
+            self.stack_shifts = []
+
+            for shift, dataside in zip(self.relative_shifts,
+                                       self.dataside_list):
+
+                if dataside is 'bottom' or dataside is 'left':
+                    self.stack_shifts.append(0 - shift)
+                else:
+                    self.stack_shifts.append(1 + shift)
+
+
+    def move_spines(self):
+        """
+        Move the stacked spines around
+
+        """
+
+        if self.stack_shifts is not None:
+
+            for subgrid, dataside, shift in zip(self.axes, self.dataside_list,
+                                                 self.stack_shifts):
+
+                for ax in subgrid:
+                    ax.spines[dataside].set_position(('axes', shift))
+
+
+    def reset_spineshift(self):
+        """
+        Reset the spines to normal position
+
+        """
+        shifts = {'x' : {'left' : 0.0,
+                         'right' : 1.0},
+                  'y' : {'bottom' : 0.0,
+                          'top' : 1.0}}
+
+        sd = shifts[self.mainax_id]
+
+        for subgrid, dataside in zip(self.axes, self.dataside_list):
+
+            for ax in subgrid:
+                ax.spines[dataside].set_position(('axes', sd[dataside]))
+
+        self.relative_shifts = None
+        self.stack_shifts = None
+
+
+    def pop_data_ax(self, subgrid, side):
+        """
+        Pop out data axis from row or column
+
+        """
+
+        data_ind = self.side_inds[side]
+        data_ax = subgrid.pop(data_ind)
+
+        return data_ind, data_ax
+
+
+    def replace_data_ax(self, subgrid, data_ind, data_ax):
+        """
+        Put data axis back in its original place in row or column
+
+        """
+
+        if data_ind == 0:
+            subgrid.insert(data_ind, data_ax)
+        else:
+            subgrid.append(data_ax)
+
+
+    def replace_spines(self):
+        """
+        Undo the spine-hiding actions of self.cleanup_grid()
+
+        """
+
+        spinelist = ['top', 'bottom', 'left', 'right']
+
+        for row in self.axes:
+            for ax in row:
+                for sp in spinelist:
+                    ax.spines[sp].set_visible(True)
 
 
 class X_Grid(Grid):
@@ -178,13 +292,17 @@ class X_Grid(Grid):
 
         Parameters
         ----------
-        xratios : int or iterable of ints
-        yratios : int or iterable of ints
-        figsize : tuple of ints
+        xratios : int or list of ints
+            The relative sizes of the columns.  Not directly comparable
+            to yratios.
+        yratios : int or list of ints
+            The relative sizes of the rows.  Not directly comparable to xratios.
+        figsize : tuple of ints or floats
+            The figure dimensions in inches
 
         Keyword Arguments
         -----------------
-        to_twin : iterable of ints
+        to_twin : list of ints
             The indices of the rows to twin
 
         """
@@ -197,7 +315,7 @@ class X_Grid(Grid):
         xpos = 0
         ypos = 0
 
-        fig = plt.figure(figsize=figsize)
+        self.fig = plt.figure(figsize=figsize)
 
         # Create axes row by row
         for rowspan in self.yratios:
@@ -238,70 +356,49 @@ class X_Grid(Grid):
         """
         Adjust vertical spacing between rows.
 
+        Parameters
+        ----------
+        hspace : float
+
         """
         plt.subplots_adjust(hspace=hspace)
 
 
     def cleanup_grid(self):
         """
-        Removes spines so that only one on each axis is visible
+        Remove unnecessary spines from grid
 
         """
 
         for row, dataside, stackpos in zip(self.axes, self.dataside_list,
                                            self.stackpos_list):
 
-            # Set the tick labels for the main axis
+            # Get mainax tick labelling settings
             ltop, lbottom = self.mainax_ticks[stackpos]
 
-            # Set main axis tick parameters
+            # Set mainax tick parameters and positions
             for ax in row:
                 ax.xaxis.set_tick_params(labeltop=ltop, labelbottom=lbottom)
                 ax.xaxis.set_ticks_position(stackpos)
 
-            # Figure out which axis in row is supposed to have stackedax spine
-            data_ind = self.side_inds[dataside]
+            data_ind, data_ax = self.pop_data_ax(row, dataside)
 
-            # Get the one axis in the row that will have spine, set ticks
-            data_ax = row.pop(data_ind)
+            # Set tick marks and label position, spines
             data_ax.yaxis.set_ticks_position(dataside)
 
-            # Based on position in the stack and side of plot it's on,
-            # get rid of extra spines
-            for sp in self.spine_begone[pos][dataside]:
+            for sp in self.spine_begone[stackpos][dataside]:
                 data_ax.spines[sp].set_visible(False)
 
-            # For all other axes, get rid of unnecessary spines, tick(label)s
             for ax in row:
+                # Remove tick marks, tick labels
                 ax.yaxis.set_ticks_position('none')
                 plt.setp(ax.get_yticklabels(), visible=False)
 
-                for sp in self.spine_begone[pos]['none']:
+                for sp in self.spine_begone[stackpos]['none']:
                     ax.spines[sp].set_visible(False)
 
-            # Put data axis back in row
-            if data_ind == 0:
-                row.insert(dat_ind, data_ax)
-            else:
-                row.append(data_ax)
+            self.replace_data_ax(row, data_ind, data_ax)
 
-            # row[data_ind].plot([0.5], [0.5], marker='s', markersize=25)
-
-
-    def shift_spines(self):
-        """
-        Move the stacked spines around
-
-        """
-
-        if self.stack_shifts is not None:
-
-            for row, dataside, shift, in zip(self.axes, self.dataside_list,
-                                             self.stack_shifts):
-
-                data_ind = self.side_inds[dataside]
-                data_ax = row.pop(data_ind)
-                data_ax.spines[dataside].set_position(('axes', shift))
 
 
 class Y_Grid(Grid):
@@ -311,7 +408,22 @@ class Y_Grid(Grid):
     """
     def __init__(self, xratios, yratios, figsize, to_twin=None):
         """
-        Initialize grid with the y-axis as main axis
+        Initialize a Y_Grid object
+
+        Parameters
+        ----------
+        xratios : int or list of ints
+            The relative sizes of the columns.  Not directly comparable
+            to yratios.
+        yratios : int or list of ints
+            The relative sizes of the rows.  Not directly comparable to xratios.
+        figsize : tuple of ints or floats
+            The figure dimensions in inches
+
+        Keyword Arguments
+        -----------------
+        to_twin : list of ints
+            The indices of the columns to twin
 
         """
         # Initialize parent class
@@ -322,7 +434,7 @@ class Y_Grid(Grid):
         xpos = 0
         ypos = 0
 
-        fig = plt.figure(figsize=figsize)
+        self.fig = plt.figure(figsize=figsize)
 
         # Create axes column by column
         for colspan in self.xratios:
@@ -351,6 +463,8 @@ class Y_Grid(Grid):
                 ypos += rowspan
 
             self.axes.append(col)
+
+            # Reset y position to top, move to next x position
             ypos = 0
             xpos += colspan
 
@@ -359,6 +473,10 @@ class Y_Grid(Grid):
         """
         Adjust the horizontal spacing between columns
 
+        Parameters
+        ----------
+        wspace : float
+
         """
 
         plt.subplots_adjust(wspace=wspace)
@@ -366,7 +484,7 @@ class Y_Grid(Grid):
 
     def cleanup_grid(self):
         """
-        Removes extra spines from axes
+        Removes unnecessary spines from grid
 
         """
 
@@ -376,11 +494,44 @@ class Y_Grid(Grid):
             # Get mainax tick labelling settings
             lleft, lright = self.mainax_ticks[stackpos]
 
+            # Set mainax tick parameters and positions
             for ax in col:
                 ax.yaxis.set_tick_params(labelleft=lleft, labelright=lright)
                 ax.yaxis.set_ticks_position(stackpos)
 
-            data_ind = self.side_inds[dataside]
+            data_ind, data_ax = self.pop_data_ax(col, dataside)
 
-            data_ax - col.pop(data_ind)
-            data_ax.xaxis.set_ticks_position
+            # Set tick marks and label position, spines
+            data_ax.xaxis.set_ticks_position(dataside)
+
+            for sp in self.spine_begone[stackpos][dataside]:
+                data_ax.spines[sp].set_visible(False)
+
+            for ax in col:
+                # Remove tick marks, tick labels
+                ax.xaxis.set_ticks_position('none')
+                plt.setp(ax.get_xticklabels(), visible=False)
+
+                # Remove spines
+                for sp in self.spine_begone[stackpos]['none']:
+                    ax.spines[sp].set_visible(False)
+
+            self.replace_data_ax(col, data_ind, data_ax)
+
+
+def _ratios_arelists(ratios):
+    """
+    Check if xratios, yratios are lists; rectify if not.
+        Private, only used internally in Grid class
+
+    """
+
+    try:
+        rsum = sum(ratios)
+    except TypeError:
+        rsum = ratios
+        rlist = [ratios]
+    else:
+        rlist = ratios
+
+    return rsum, rlist
