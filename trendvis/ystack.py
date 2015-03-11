@@ -4,12 +4,11 @@ import draw
 import plot_accessory as pa
 
 def multi_y(figsize, plotspacing, yratios, xlimits, plotdata,
-            xlabel, ylabels, xticks, yticks, line_kwargs={}, reverse_y=None,
+            xlabel, ylabels, xticks, yticks, line_kw={}, reverse_y=None,
             reverse_x=False, ylimits=None, startside='left',
             alternate_sides=True, yaxis_shift=None, spinewidth=3,
             black_spines=False, use_lastcolor=False,
-            majortick_dim=(15,5), minortick_dim=(6,3),
-            tick_direction=('out', 'out'), ticklabel_formatter='%d',
+            majortick_kw={}, ticklabel_formatter='%d',
             axes_to_twin=None, twins_behind=True, shift_twinnedax=0.2,
             reorder=None, draw_frame=(False, 3), draw_bars=None,
             bar_location=None, draw_columns=None, draw_rectangles=None):
@@ -138,7 +137,21 @@ def multi_y(figsize, plotspacing, yratios, xlimits, plotdata,
                           'zorder' : 10,
                           'lw' : spinewidth-1}
 
-    default_kwargs.update(line_kwargs)
+    default_kwargs.update(line_kw)
+
+    default_majortick_kw = {'direction':'out',
+                            'length':15,
+                            'width':5,
+                            'labelsize':16,
+                            'pad':10}
+
+    default_majortick_kw.update(majortick_kw)
+
+    default_minortick_kw = {'direction':'out',
+                            'length':15,
+                            'width':5}
+
+    default_minortick_kw.update(minortick_kw)
 
     # Initialize subplot row position, total grid rows, and axes list
     ypos = 0
@@ -169,25 +182,12 @@ def multi_y(figsize, plotspacing, yratios, xlimits, plotdata,
         ypos += rowspan
 
     # Make position and side lists for original axes
-    if numrows == 1:
-        pos_list = ['both']
-        side_list = [startside]
-    else:
-        nonerows = numrows - 2
-        post_list = ['top'] + ['none']*nonerows + ['bottom']
+    pos_list, side_list = pa.yposition_datasides(numrows, alternate_sides,
+                                                 alt_sides, startside)
 
-        if alternate_sides:
-            side_list = [startside]
-            for i in range(1, numrows):
-                newside = alt_sides[side_list[i-1]]
-                side_list.append(newside)
-        else:
-            side_list = [startside]*numrows
 
-    if yaxis_shift is None:
-        axshifts = [0.0]*numrows
-    else:
-        axshifts = yaxis_shift
+    axshifts = pa.shift_list(yaxis_shift, numrows)
+
 
     if axes_to_twin is not None:
         for ind in axes_to_twin:

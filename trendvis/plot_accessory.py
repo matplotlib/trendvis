@@ -54,7 +54,7 @@ def set_yticks(axis, yticks, ycolor, majordim, minordim, tick_direction,
 
 
 def set_xticks(axis, xticks, xcolor, majordim, minordim, tick_direction,
-               labelsize, pad, formatter):
+               tick_params_kw, formatter):
     """
     Set x ticks
 
@@ -100,7 +100,39 @@ def set_xticks(axis, xticks, xcolor, majordim, minordim, tick_direction,
                                color=xcolor)
 
     # Set the tick label size and position
-    axis.tick_params(labelsize=labelsize, pad=pad)
+    axis.tick_params(**tick_params_kw)
+
+
+def yposition_datasides(numrows, alternate_sides, altsides_dict, startside):
+    """
+    """
+    if numrows == 1:
+        pos_list = ['both']
+        side_list = [startside]
+    else:
+        nonerows = numrows - 2
+        pos_list = ['top'] + ['none']*nonerows + ['bottom']
+
+        if alternate_sides:
+            side_list = [startside]
+            for i in range(1, numrows):
+                newside = altsides_dict[side_list[i-1]]
+                side_list.append(newside)
+        else:
+            side_list = [startside]*numrows
+
+    return pos_list, side_list
+
+def xposition_datasides(numcols, alternate_sides, altsides_dict, startside):
+    """
+    """
+
+
+def shift_list(shift_by, num):
+    if shift_by is None:
+        shift_degrees = [0.0]*num
+    else:
+        shift_degrees = shift_by
 
 
 def reordering(reorder, ratios, ticks, labels, axis_shift, to_twin, reverse_ax,

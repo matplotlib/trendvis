@@ -266,7 +266,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
             axshifts.extend([shift_twinnedax]*len(rows_to_twin))
 
     for s, (shift, side) in enumerate(zip(axshifts, side_list)):
-        if side is 'left'
+        if side is 'left':
             axshifts[s] = 0 - shift
         else:
             axshifts[s] = 1 + shift
