@@ -83,40 +83,7 @@ class Grid(object):
                                            'none' : ['top', 'bottom']}}
 
 
-    def set_mainax_relshift(self, axis_shift=None):
-        """
-        Set universal main axis spine shift by providing a float
-        Set individual axis spine shift by providing a list of floats where
-            len(axis_shift) = 2
-
-        """
-
-        if axis_shift is None:
-            self.mainax_relshifts = None
-            self.main_shifts = None
-        elif 'both' in stackpos_list:
-            self.mainax_relshifts = None
-            self.main_shifts = None
-
-        else:
-            try:
-                # Check if iterable
-                axis_shift[0]
-            except:
-                # if not a list, apply same shift to both
-                self.mainax_relshifts = [axis_shift] * 2
-            else:
-                if len(axis_shift) != 2:
-                    print 'Warning:  len(axis_shift) != 2'
-                    self.mainax_relshifts = [axis_shift[0]] * 2
-                else:
-                    self.mainax_relshifts = axis_shift
-
-            self.main_shifts = []
-
-
-
-    def set_stackedax_relshift(self, axis_shift=None):
+    def set_relative_axshift(self, axis_shift=None):
         """
         Set universal stacked axis spine shift by providing a float
         Set individual axis spine shift by providing a list of floats where
@@ -145,7 +112,7 @@ class Grid(object):
             self.stack_shifts = []
 
 
-    def set_stackedax_abshift(self):
+    def set_absolute_axshift(self):
         """
         Set the stacked axes shifts for realz
 
@@ -158,23 +125,6 @@ class Grid(object):
                     self.stack_shifts.append(0 - shift)
                 else:
                     self.stack_shifts.append(1 + shift)
-
-
-    def set_mainax_abshift(self):
-        """
-        Set the main axis shift for realz
-
-        """
-
-        if self.main_shifts is not None:
-            if self.mainax_id is 'x':
-                # in top to bottom
-                self.main_shifts.append(1 + self.mainax_relshifts)
-                self.main_shifts.append(0 - self.mainax_relshifts)
-            else:
-                # left to right
-                self.main_shifts.append(0 - self.mainax_relshifts)
-                self.main_shifts.append(1 + self.mainax_relshifts)
 
 
     def set_dataside(self, startside, alternate_sides):
@@ -214,6 +164,7 @@ class Grid(object):
             num_nones = self.stackdim - 2
             self.stackpos_list = ([startpos] +['none']*num_nones +
                                   [alt_pos[startpos]])
+
 
 class X_Grid(Grid):
     """
@@ -337,22 +288,7 @@ class X_Grid(Grid):
             # row[data_ind].plot([0.5], [0.5], marker='s', markersize=25)
 
 
-    def shift_mainspines(self):
-        """
-        Move the main spines around
-
-        """
-        if self.main_shifts is not None:
-
-            for row, stackpos, shift in zip([self.axes[0], self.axes[-1]],
-                                            [self.stackpos_list[0],
-                                             self.stackpos_list[-1],
-                                            self.main_shifts):
-                for ax in row:
-                    ax.spines[stackpos].set_position(('axes', shift))
-
-
-    def shfit_stackedspines(self):
+    def shift_spines(self):
         """
         Move the stacked spines around
 
