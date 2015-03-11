@@ -13,7 +13,7 @@ bars, or rectangles of interest.
 
 """
 
-__all__ = ['brokenx',
+__all__ = ['broken_x',
            'discrete_colorplot',
            'set_xticks',
            'set_yticks',
