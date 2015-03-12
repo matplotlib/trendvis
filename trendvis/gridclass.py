@@ -133,6 +133,22 @@ class Grid(object):
         else:
             self.dataside_list = self.dataside_list * self.stackdim
 
+        self.update_twinsides()
+
+
+    def update_twinsides(self):
+        """
+        Update the sides that twinned axes appear on in the event of a
+            change to self.dataside_list.
+
+        """
+
+        if self.twin_dim is not None:
+            self.dataside_list = self.dataside_list[:self.stackdim]
+            for ind in self.twinds:
+                twinside = self.alt_sides[self.dataside_list[ind]]
+                self.dataside_list.append(twinside)
+
 
     def set_stackposition(self, onespine_forboth):
         """
@@ -203,7 +219,6 @@ class Grid(object):
                     self.reltwin_shifts = twin_shift
 
 
-
     def set_absolute_axshift(self):
         """
         Translate self.relative_shifts to absolute values based on the
@@ -233,7 +248,6 @@ class Grid(object):
                     self.twin_shifts.append(0 - shift)
                 else:
                     self.twin_shifts.append(1 + shift)
-
 
 
     def move_spines(self):
@@ -413,7 +427,38 @@ class X_Grid(Grid):
             xpos = 0
             ypos += rowspan
 
-    # def make_twins(self, cols_to_twin):
+    def make_twins(self, rows_to_twin):
+        """
+        Twin columns
+
+        Parameters
+        ----------
+        rows_to_twin : list of ints
+            Indices of the columns to twin
+
+        """
+        if self.twinds is None:
+            self.twinds = rows_to_twin
+            self.twin_dim = len(rows_to_twin)
+        else:
+            self.twinds.extend(rows_to_twin)
+            self.twin_dim += len(rows_to_twin)
+
+        for ind in rows_to_twin:
+
+            twin_row = []
+
+            for ax in self.axes[ind]:
+                twin = ax.twinx()
+                ax.set_zorder(twin.get_zorder()+1)
+                twin_row.append(twin)
+
+            twinside = self.alt_sides[self.dataside_list[ind]]
+            self.dataside_list.append(twinside)
+            self.stackpos_list.append('none')
+            self.axes.append(twin_row)
+
+        self.grid_isclean = False
 
 
     def adjust_spacing(self, hspace):
@@ -466,7 +511,6 @@ class X_Grid(Grid):
                 self.replace_data_ax(row, data_ind, data_ax)
 
         self.grid_isclean = True
-
 
 
 class Y_Grid(Grid):
@@ -602,35 +646,39 @@ class Y_Grid(Grid):
 
         """
 
-        for col, dataside, stackpos in zip(self.axes, self.dataside_list,
-                                           self.stackpos_list):
+        if not self.grid_isclean:
 
-            # Get mainax tick labelling settings
-            lleft, lright = self.mainax_ticks[stackpos]
+            for col, dataside, stackpos in zip(self.axes, self.dataside_list,
+                                               self.stackpos_list):
 
-            # Set mainax tick parameters and positions
-            for ax in col:
-                ax.yaxis.set_tick_params(labelleft=lleft, labelright=lright)
-                ax.yaxis.set_ticks_position(stackpos)
+                # Get mainax tick labelling settings
+                lleft, lright = self.mainax_ticks[stackpos]
 
-            data_ind, data_ax = self.pop_data_ax(col, dataside)
+                # Set mainax tick parameters and positions
+                for ax in col:
+                    ax.yaxis.set_tick_params(labelleft=lleft, labelright=lright)
+                    ax.yaxis.set_ticks_position(stackpos)
 
-            # Set tick marks and label position, spines
-            data_ax.xaxis.set_ticks_position(dataside)
+                data_ind, data_ax = self.pop_data_ax(col, dataside)
 
-            for sp in self.spine_begone[stackpos][dataside]:
-                data_ax.spines[sp].set_visible(False)
+                # Set tick marks and label position, spines
+                data_ax.xaxis.set_ticks_position(dataside)
 
-            for ax in col:
-                # Remove tick marks, tick labels
-                ax.xaxis.set_ticks_position('none')
-                plt.setp(ax.get_xticklabels(), visible=False)
+                for sp in self.spine_begone[stackpos][dataside]:
+                    data_ax.spines[sp].set_visible(False)
 
-                # Remove spines
-                for sp in self.spine_begone[stackpos]['none']:
-                    ax.spines[sp].set_visible(False)
+                for ax in col:
+                    # Remove tick marks, tick labels
+                    ax.xaxis.set_ticks_position('none')
+                    plt.setp(ax.get_xticklabels(), visible=False)
 
-            self.replace_data_ax(col, data_ind, data_ax)
+                    # Remove spines
+                    for sp in self.spine_begone[stackpos]['none']:
+                        ax.spines[sp].set_visible(False)
+
+                self.replace_data_ax(col, data_ind, data_ax)
+
+        self.grid_isclean = True
 
 
 def _ratios_arelists(ratios):
