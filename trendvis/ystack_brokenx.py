@@ -3,12 +3,13 @@ import matplotlib.pyplot as plt
 import draw
 import plot_accessory as pa
 
+
 def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
              xlabels, ylabels, xticks, yticks, line_kwargs={}, reverse_y=None,
              reverse_x=False, ylimits=None,
              startside='left', alternate_sides=True, yaxis_shift=None,
              spinewidth=3, black_spines=False, use_lastcolor=False,
-             majortick_dim=(15,5), minortick_dim=(6,3),
+             majortick_dim=(15, 5), minortick_dim=(6, 3),
              tick_direction=('out', 'out'), ticklabel_formatter='%d',
              rows_to_twin=None, twins_behind=True, shift_twinnedax=0.2,
              reorder=None, draw_frame=(False, 3), draw_cutout=(True, 0.015),
@@ -145,10 +146,10 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
                     'both'  : {'left' : ['right'],
                                'right': ['left']}}
 
-    xtick_labels = {'top' : ('on', 'off'),
-                    'both' : ('on', 'on'),
-                    'bottom' : ('off', 'on'),
-                    'none' : ('off', 'off')}
+    xtick_labels = {'top'   : ('on', 'off'),
+                    'both'  : ('on', 'on'),
+                    'bottom': ('off', 'on'),
+                    'none'  : ('off', 'off')}
 
     alt_sides = {'left' : 'right',
                  'right': 'left'}
@@ -157,10 +158,10 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
                  'right': -1}
 
     default_linekwargs = {'marker' : 'o',
-                          'ls' : '-',
-                          'markeredgecolor' : 'none',
+                          'ls'     : '-',
+                          'lw'     : spinewidth - 1,
                           'zorder' : 10,
-                          'lw' : spinewidth-1}
+                          'markeredgecolor' : 'none'}
 
     default_linekwargs.update(line_kwargs)
 
@@ -194,7 +195,6 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
     else:
         column_order = range(0, numcols)
 
-
     # Initialize axes and put in nested lists
     for rowspan in yratios:
         row = []
@@ -211,9 +211,9 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
             if ypos > 0:
                 sharex = axes[0][c]
 
-            ax = plot.subplot2grid((gridrows, gridcols), (ypos, xpos),
-                                   rowspan=rowspan, colspan=colspan,
-                                   sharey=sharey, sharex=sharex)
+            ax = plt.subplot2grid((gridrows, gridcols), (ypos, xpos),
+                                  rowspan=rowspan, colspan=colspan,
+                                  sharey=sharey, sharex=sharex)
             row.append(ax)
             xpos += colspan
 
@@ -232,7 +232,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
         if alternate_sides:
             side_list = [startside]
             for i in range(1, numrows):
-                newside = alt_sides[side_list[i-1]]
+                newside = alt_sides[side_list[i - 1]]
                 side_list.append(newside)
         else:
             side_list = [startside]*numrows
@@ -240,7 +240,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
     if yaxis_shift is None:
         axshifts = [0.0]*numrows
     else:
-        axshifts=yaxis_shift
+        axshifts = yaxis_shift
 
     # Make twins, adjust zorder if necessary
     if rows_to_twin is not None:
@@ -251,7 +251,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
             for ax in axes[ind]:
                 twin = ax.twinx()
                 if twins_behind:
-                    ax.set_zorder(twin.get_zorder()+1)
+                    ax.set_zorder(twin.get_zorder() + 1)
                 twin_row.append(twin)
 
             twinside = alt_sides[side_list[ind]]
@@ -287,7 +287,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
 
             # Set x labels and format ticks
             if pos != 'none':
-                set_xticks()
+                ax.set_xticks()
                 ax.set_xlabel(xlabels, fontsize=20, labelpad=15)
                 if pos != 'bottom':
                     ax.spines['top'].set_linewidth(spinewidth)
@@ -372,7 +372,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
 
     if draw_frame[0]:
         for i in range(0, numcols):
-            draw.frame(fig, axes[numrows-1][i], axes[0][i], draw_frame[1])
+            draw.frame(fig, axes[numrows - 1][i], axes[0][i], draw_frame[1])
 
     elif draw_cutout[0]:
         draw.cutout(axes, draw_cutout[1], xratios, numcols, numrows)
