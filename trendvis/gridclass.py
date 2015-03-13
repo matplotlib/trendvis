@@ -106,7 +106,6 @@ class Grid(object):
                                            'bottom' : ['top'],
                                            'none' : ['top', 'bottom']}}
 
-
     def set_dataside(self, startside, alternate_sides):
         """
         Set the dataside_list that indicates which stacked ax spine will be
@@ -127,14 +126,13 @@ class Grid(object):
 
         if alternate_sides:
             for i in range(1, self.stackdim):
-                newside = self.alt_sides[self.dataside_list[i-1]]
+                newside = self.alt_sides[self.dataside_list[i - 1]]
                 self.dataside_list.append(newside)
 
         else:
             self.dataside_list = self.dataside_list * self.stackdim
 
         self.update_twinsides()
-
 
     def update_twinsides(self):
         """
@@ -148,7 +146,6 @@ class Grid(object):
             for ind in self.twinds:
                 twinside = self.alt_sides[self.dataside_list[ind]]
                 self.dataside_list.append(twinside)
-
 
     def set_stackposition(self, onespine_forboth):
         """
@@ -176,9 +173,8 @@ class Grid(object):
 
         else:
             num_nones = self.stackdim - 2
-            self.stackpos_list = ([self.startpos] +['none']*num_nones +
+            self.stackpos_list = ([self.startpos] + ['none']*num_nones +
                                   [alt_pos[self.startpos]])
-
 
     def set_relative_axshift(self, axis_shift=None, twin_shift=None):
         """
@@ -218,7 +214,6 @@ class Grid(object):
                 else:
                     self.reltwin_shifts = twin_shift
 
-
     def set_absolute_axshift(self):
         """
         Translate self.relative_shifts to absolute values based on the
@@ -249,7 +244,6 @@ class Grid(object):
                 else:
                     self.twin_shifts.append(1 + shift)
 
-
     def move_spines(self):
         """
         Move the stacked spines around
@@ -272,17 +266,15 @@ class Grid(object):
                 for ax in subgrid:
                     ax.spines[dataside].set_position(('axes', shift))
 
-
     def reset_spineshift(self):
         """
         Reset all spines to normal position
 
         """
-        shifts = {'x' : {'left' : 0.0,
-                         'right' : 1.0},
+        shifts = {'x' : {'left'   : 0.0,
+                         'right'  : 1.0},
                   'y' : {'bottom' : 0.0,
-                          'top' : 1.0}}
-
+                          'top'   : 1.0}}
 
         sd = shifts[self.mainax_id]
 
@@ -296,7 +288,6 @@ class Grid(object):
         self.reltwin_shifts = None
         self.twin_shifts = None
 
-
     def pop_data_ax(self, subgrid, side):
         """
         Pop out data axis from row or column
@@ -308,7 +299,6 @@ class Grid(object):
 
         return data_ind, data_ax
 
-
     def replace_data_ax(self, subgrid, data_ind, data_ax):
         """
         Put data axis back in its original place in row or column
@@ -319,7 +309,6 @@ class Grid(object):
             subgrid.insert(data_ind, data_ax)
         else:
             subgrid.append(data_ax)
-
 
     def replace_spines(self):
         """
@@ -335,7 +324,6 @@ class Grid(object):
                     ax.spines[sp].set_visible(True)
 
         self.grid_isclean = False
-
 
     def remove_twins(self):
         """
