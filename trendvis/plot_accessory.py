@@ -1,9 +1,9 @@
-import numpy as np
-import matplotlib.pyplot as plt
+from __future__ import division
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
+
 def set_yticks(axis, yticks, ycolor, majordim, minordim, tick_direction,
-              labelsize, pad, formatter):
+               labelsize, pad, formatter):
 
     """
     Set y ticks.
@@ -32,11 +32,11 @@ def set_yticks(axis, yticks, ycolor, majordim, minordim, tick_direction,
     """
 
     # Initialize and set major and minor tick locators, formatters
-    ymajorLocator = MultipleLocator(yticks[0])
-    yminorLocator = MultipleLocator(yticks[1])
+    ymajor_locator = MultipleLocator(yticks[0])
+    yminor_locator = MultipleLocator(yticks[1])
 
-    axis.yaxis.set_major_locator(ymajorLocator)
-    axis.yaxis.set_minor_locator(yminorLocator)
+    axis.yaxis.set_major_locator(ymajor_locator)
+    axis.yaxis.set_minor_locator(yminor_locator)
 
     frmttr = FormatStrFormatter(formatter)
     axis.yaxis.set_major_formatter(frmttr)
@@ -82,11 +82,11 @@ def set_xticks(axis, xticks, xcolor, majordim, minordim, tick_direction,
     """
 
     # Initialize and set major and minor tick locators, formatters
-    xmajorLocator = MultipleLocator(xticks[0])
-    xminorLocator = MultipleLocator(xticks[1])
+    xmajor_locator = MultipleLocator(xticks[0])
+    xminor_locator = MultipleLocator(xticks[1])
 
-    axis.xaxis.set_major_locator(xmajorLocator)
-    axis.xaxis.set_minor_locator(xminorLocator)
+    axis.xaxis.set_major_locator(xmajor_locator)
+    axis.xaxis.set_minor_locator(xminor_locator)
 
     frmttr = FormatStrFormatter(formatter)
     axis.xaxis.set_major_formatter(frmttr)
@@ -116,12 +116,13 @@ def yposition_datasides(numrows, alternate_sides, altsides_dict, startside):
         if alternate_sides:
             side_list = [startside]
             for i in range(1, numrows):
-                newside = altsides_dict[side_list[i-1]]
+                newside = altsides_dict[side_list[i - 1]]
                 side_list.append(newside)
         else:
             side_list = [startside]*numrows
 
     return pos_list, side_list
+
 
 def xposition_datasides(numcols, alternate_sides, altsides_dict, startside):
     """
@@ -134,9 +135,11 @@ def shift_list(shift_by, num):
     else:
         shift_degrees = shift_by
 
+    return shift_degrees
 
-def reordering(reorder, ratios, ticks, labels, axis_shift, to_twin, reverse_ax,
-               bar_location, limits):
+
+def reordering(plotdata, reorder, ratios, ticks, labels, axis_shift, to_twin,
+               reverse_ax, bar_location, limits):
     """
     """
     plotdata = reorder_bysort(reorder, plotdata)
@@ -155,7 +158,7 @@ def reordering(reorder, ratios, ticks, labels, axis_shift, to_twin, reverse_ax,
         bar_location = reorder_byindex(reorder, bar_location)
 
     if limits is not None:
-        re_limits = []:
+        re_limits = []
         for lim in limits:
             re_limits.append((reorder.index(lim[0]), lim[1], lim[2]))
 
@@ -163,7 +166,6 @@ def reordering(reorder, ratios, ticks, labels, axis_shift, to_twin, reverse_ax,
 
     return (plotdata, ratios, ticks, labels, axis_shift, to_twin, reverse_ax,
             bar_location, limits)
-
 
 
 def reorder_bysort(reorder, to_sort):
@@ -186,7 +188,7 @@ def reorder_bysort(reorder, to_sort):
 
     rlen = len(reorder)
     re_sort = [x for (y, x) in sorted(zip(reorder, to_sort[:rlen]))]
-    re_sort.extend(plotdata[rlen:])
+    re_sort.extend(to_sort[rlen:])
 
     return re_sort
 
@@ -271,4 +273,3 @@ def reorder_byindex(reorder, to_sort):
 
 #     return (plotdata, rows_to_twin, reverse_y, yratios, yticks, yaxis_shift,
 #             ylabels, ylimits, bar_loc)
-
