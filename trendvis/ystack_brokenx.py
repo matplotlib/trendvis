@@ -14,7 +14,7 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
              rows_to_twin=None, twins_behind=True, shift_twinnedax=0.2,
              reorder=None, draw_frame=(False, 3), draw_cutout=(True, 0.015),
              draw_bars=None, bar_location=None, draw_columns=None,
-             col_loc=None, draw_rectangles=None):
+             col_loc=None, draw_rectangles=None, tick_kwargs={}):
     """
     Creates a figure with multiple y-axes stacked over a broken x-axis.
 
@@ -163,7 +163,11 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
                           'zorder' : 10,
                           'markeredgecolor' : 'none'}
 
+    default_tick_kwargs = {'labelpad': 10,
+                           'fontsize': 14}
+
     default_linekwargs.update(line_kwargs)
+    default_tick_kwargs.update(tick_kwargs)
 
     ypos = 0
     xpos = 0
@@ -287,7 +291,9 @@ def broken_x(figsize, plotspacing, yratios, xratios, xlimits, plotdata,
 
             # Set x labels and format ticks
             if pos != 'none':
-                ax.set_xticks()
+                pa.set_xticks(ax, xticks, 'black', majortick_dim,
+                              minortick_dim, tick_direction,
+                              default_tick_kwargs, ticklabel_formatter)
                 ax.set_xlabel(xlabels, fontsize=20, labelpad=15)
                 if pos != 'bottom':
                     ax.spines['top'].set_linewidth(spinewidth)
