@@ -2,10 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gridclass import Grid
 
+
 class Y_Grid(Grid):
     """
     Class for making a plot with the Y axis as the main axis
-    	and a stack of x axes
+        and a stack of x axes
 
     """
 
@@ -84,7 +85,6 @@ class Y_Grid(Grid):
         self.set_dataside(startside, alternate_sides)
         self.set_stackposition(onespine_forboth)
 
-
     def make_twins(self, cols_to_twin):
         """
         Twin columns
@@ -109,7 +109,7 @@ class Y_Grid(Grid):
 
             for ax in self.axes[ind]:
                 twin = ax.twiny()
-                ax.set_zorder(twin.get_zorder()+1)
+                ax.set_zorder(twin.get_zorder() + 1)
                 twin_col.append(twin)
 
             twinside = self.alt_sides[self.dataside_list[ind]]
@@ -118,7 +118,6 @@ class Y_Grid(Grid):
             self.axes.append(twin_col)
 
         self.grid_isclean = False
-
 
     def adjust_spacing(self, wspace):
         """
@@ -131,7 +130,6 @@ class Y_Grid(Grid):
         """
 
         plt.subplots_adjust(wspace=wspace)
-
 
     def cleanup_grid(self):
         """
