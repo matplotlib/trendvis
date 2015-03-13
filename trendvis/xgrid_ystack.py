@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gridclass import Grid
 
+
 class X_Grid(Grid):
     """
     Class for making a plot with the x axis as the main axis
@@ -84,7 +85,6 @@ class X_Grid(Grid):
         self.set_dataside(startside, alternate_sides)
         self.set_stackposition(onespine_forboth)
 
-
     def make_twins(self, rows_to_twin):
         """
         Twin rows
@@ -109,7 +109,7 @@ class X_Grid(Grid):
 
             for ax in self.axes[ind]:
                 twin = ax.twinx()
-                ax.set_zorder(twin.get_zorder()+1)
+                ax.set_zorder(twin.get_zorder() + 1)
                 twin_row.append(twin)
 
             twinside = self.alt_sides[self.dataside_list[ind]]
@@ -118,7 +118,6 @@ class X_Grid(Grid):
             self.axes.append(twin_row)
 
         self.grid_isclean = False
-
 
     def adjust_spacing(self, hspace):
         """
@@ -131,7 +130,6 @@ class X_Grid(Grid):
         """
 
         plt.subplots_adjust(hspace=hspace)
-
 
     def cleanup_grid(self):
         """
