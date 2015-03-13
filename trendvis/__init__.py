@@ -30,7 +30,9 @@ from .ystack_brokenx import broken_x
 
 from .colorplots import discrete_colorplot
 
-from .plot_accessory import set_yticks, set_xticks, reorder_sort, reorder_index
+from .plot_accessory import (set_yticks, set_xticks,
+                             reorder_bysort as reorder_sort,
+                             reorder_byindex as reorder_index)
 
 from .ystack import multi_y
 

@@ -142,7 +142,7 @@ def reordering(reorder, ratios, ticks, labels, axis_shift, to_twin, reverse_ax,
                bar_location, limits):
     """
     """
-    plotdata = reorder_bysort(reorder, plotdata)
+    # plotdata = reorder_bysort(reorder, plotdata)
     ratios = reorder_bysort(reorder, ratios)
     ticks = reorder_bysort(reorder, ticks)
     labels = reorder_bysort(reorder, labels)
@@ -188,7 +188,7 @@ def reorder_bysort(reorder, to_sort):
 
     rlen = len(reorder)
     re_sort = [x for (y, x) in sorted(zip(reorder, to_sort[:rlen]))]
-    re_sort.extend(plotdata[rlen:])
+    # re_sort.extend(plotdata[rlen:])
 
     return re_sort
 

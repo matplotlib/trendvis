@@ -36,6 +36,13 @@ class Grid(object):
         self.relative_shifts = None
         self.stack_shifts = None
 
+        self.twinds = None
+        self.twin_dim = None
+        self.reltwin_shifts = None
+        self.twin_shifts = None
+
+        self.grid_isclean = False
+
         if mainax_x:
             self.mainax_id = 'x'
             self.stackedax_id = 'y'
@@ -126,6 +133,22 @@ class Grid(object):
         else:
             self.dataside_list = self.dataside_list * self.stackdim
 
+        self.update_twinsides()
+
+
+    def update_twinsides(self):
+        """
+        Update the sides that twinned axes appear on in the event of a
+            change to self.dataside_list.
+
+        """
+
+        if self.twin_dim is not None:
+            self.dataside_list = self.dataside_list[:self.stackdim]
+            for ind in self.twinds:
+                twinside = self.alt_sides[self.dataside_list[ind]]
+                self.dataside_list.append(twinside)
+
 
     def set_stackposition(self, onespine_forboth):
         """
@@ -157,7 +180,7 @@ class Grid(object):
                                   [alt_pos[self.startpos]])
 
 
-    def set_relative_axshift(self, axis_shift=None):
+    def set_relative_axshift(self, axis_shift=None, twin_shift=None):
         """
         Set universal or individual stacked axis spine relative shift
 
@@ -183,6 +206,17 @@ class Grid(object):
                 else:
                     self.relative_shifts = axis_shift
 
+        if twin_shift is not None and self.twinds is not None:
+            try:
+                twin_shift[0]
+            except:
+                self.reltwin_shifts = [twin_shift] * self.twin_dim
+            else:
+                if len(twin_shift) != self.twin_dim:
+                    print 'Warning:  len(twin_shift) != number of twinned axes!'
+                    self.reltwin_shifts = [twin_shift[0]] * self.twin_dim
+                else:
+                    self.reltwin_shifts = twin_shift
 
 
     def set_absolute_axshift(self):
@@ -205,6 +239,16 @@ class Grid(object):
                 else:
                     self.stack_shifts.append(1 + shift)
 
+        if self.reltwin_shifts is not None:
+            self.twin_shifts = []
+
+            for shift, dataside in zip(self.reltwin_shifts,
+                                       self.dataside_list[self.stackdim:]):
+                if dataside is 'bottom' or dataside is 'left':
+                    self.twin_shifts.append(0 - shift)
+                else:
+                    self.twin_shifts.append(1 + shift)
+
 
     def move_spines(self):
         """
@@ -220,10 +264,18 @@ class Grid(object):
                 for ax in subgrid:
                     ax.spines[dataside].set_position(('axes', shift))
 
+        if self.twin_shifts is not None:
+
+            for subgrid, dataside, shift in zip(self.axes[self.stackdim:],
+                                                self.dataside_list[self.stackdim:],
+                                                self.twin_shifts):
+                for ax in subgrid:
+                    ax.spines[dataside].set_position(('axes', shift))
+
 
     def reset_spineshift(self):
         """
-        Reset the spines to normal position
+        Reset all spines to normal position
 
         """
         shifts = {'x' : {'left' : 0.0,
@@ -231,15 +283,18 @@ class Grid(object):
                   'y' : {'bottom' : 0.0,
                           'top' : 1.0}}
 
+
         sd = shifts[self.mainax_id]
 
-        for subgrid, dataside in zip(self.axes, self.dataside_list):
-
+        for subgrid in self.axes:
             for ax in subgrid:
-                ax.spines[dataside].set_position(('axes', sd[dataside]))
+                for key in sd:
+                    ax.spines[key].set_position(('axes', sd[key]))
 
         self.relative_shifts = None
         self.stack_shifts = None
+        self.reltwin_shifts = None
+        self.twin_shifts = None
 
 
     def pop_data_ax(self, subgrid, side):
@@ -279,244 +334,26 @@ class Grid(object):
                 for sp in spinelist:
                     ax.spines[sp].set_visible(True)
 
+        self.grid_isclean = False
 
-class X_Grid(Grid):
-    """
-    Class for making grid with x as the main axis
 
-    """
-
-    def __init__(self, xratios, yratios, figsize, to_twin=None):
+    def remove_twins(self):
         """
-        Initialize an X_Grid object
-
-        Parameters
-        ----------
-        xratios : int or list of ints
-            The relative sizes of the columns.  Not directly comparable
-            to yratios.
-        yratios : int or list of ints
-            The relative sizes of the rows.  Not directly comparable to xratios.
-        figsize : tuple of ints or floats
-            The figure dimensions in inches
-
-        Keyword Arguments
-        -----------------
-        to_twin : list of ints
-            The indices of the rows to twin
+        Get rid of twinned axes
 
         """
 
-        # Initialize parent class
-        # Last arg is True because mainax_x
-        Grid.__init__(self, xratios, yratios, True)
+        for subgrid in self.axes[self.stackdim:]:
+            for ax in subgrid:
+                self.fig.delaxes(ax)
 
-        # Set initial x and y grid positions (top left)
-        xpos = 0
-        ypos = 0
-
-        self.fig = plt.figure(figsize=figsize)
-
-        # Create axes row by row
-        for rowspan in self.yratios:
-            row = []
-
-            for c, colspan in enumerate(self.xratios):
-                sharex = None
-                sharey = None
-
-                # All axes in a row share y axis with first axis in row
-                if xpos > 0:
-                    sharey = row[0]
-
-                # All axes in a column share x axis with first axis in column
-                if ypos > 0:
-                    sharex = self.axes[0][c]
-
-                ax = plt.subplot2grid((self.gridrows, self.gridcols),
-                                      (ypos, xpos), rowspan=rowspan,
-                                      colspan=colspan, sharey=sharey,
-                                      sharex=sharex)
-
-                ax.patch.set_visible(False)
-
-                row.append(ax)
-
-                # Move to next x position
-                xpos += colspan
-
-            self.axes.append(row)
-
-            # Reset x position to left side, move to next y position
-            xpos = 0
-            ypos += rowspan
-
-
-    def adjust_spacing(self, hspace):
-        """
-        Adjust vertical spacing between rows.
-
-        Parameters
-        ----------
-        hspace : float
-
-        """
-        plt.subplots_adjust(hspace=hspace)
-
-
-    def cleanup_grid(self):
-        """
-        Remove unnecessary spines from grid
-
-        """
-
-        for row, dataside, stackpos in zip(self.axes, self.dataside_list,
-                                           self.stackpos_list):
-
-            # Get mainax tick labelling settings
-            ltop, lbottom = self.mainax_ticks[stackpos]
-
-            # Set mainax tick parameters and positions
-            for ax in row:
-                ax.xaxis.set_tick_params(labeltop=ltop, labelbottom=lbottom)
-                ax.xaxis.set_ticks_position(stackpos)
-
-            data_ind, data_ax = self.pop_data_ax(row, dataside)
-
-            # Set tick marks and label position, spines
-            data_ax.yaxis.set_ticks_position(dataside)
-
-            for sp in self.spine_begone[stackpos][dataside]:
-                data_ax.spines[sp].set_visible(False)
-
-            for ax in row:
-                # Remove tick marks, tick labels
-                ax.yaxis.set_ticks_position('none')
-                plt.setp(ax.get_yticklabels(), visible=False)
-
-                for sp in self.spine_begone[stackpos]['none']:
-                    ax.spines[sp].set_visible(False)
-
-            self.replace_data_ax(row, data_ind, data_ax)
-
-
-
-class Y_Grid(Grid):
-    """
-    Class for making a plot with the Y axis as the main axis
-
-    """
-    def __init__(self, xratios, yratios, figsize, to_twin=None):
-        """
-        Initialize a Y_Grid object
-
-        Parameters
-        ----------
-        xratios : int or list of ints
-            The relative sizes of the columns.  Not directly comparable
-            to yratios.
-        yratios : int or list of ints
-            The relative sizes of the rows.  Not directly comparable to xratios.
-        figsize : tuple of ints or floats
-            The figure dimensions in inches
-
-        Keyword Arguments
-        -----------------
-        to_twin : list of ints
-            The indices of the columns to twin
-
-        """
-        # Initialize parent class
-        # Last arg is False because mainax_x
-        Grid.__init__(self, xratios, yratios, False)
-
-        # Set initial x and y grid positions (top left)
-        xpos = 0
-        ypos = 0
-
-        self.fig = plt.figure(figsize=figsize)
-
-        # Create axes column by column
-        for colspan in self.xratios:
-            col = []
-
-            for r, rowspan in enumerate(self.yratios):
-                sharex = None
-                sharey = None
-
-                # All axes in column share x axis with first in column
-                if ypos > 0:
-                    sharex = col[0]
-
-                # All axes in row share y axis with first in row
-                if xpos > 0:
-                    sharey = self.axes[0][r]
-
-                ax = plt.subplot2grid((self.gridrows, self.gridcols),
-                                      (ypos, xpos), rowspan=rowspan,
-                                      colspan=colspan, sharex=sharex,
-                                      sharey=sharey)
-
-                ax.patch.set_visible(False)
-
-                col.append(ax)
-                ypos += rowspan
-
-            self.axes.append(col)
-
-            # Reset y position to top, move to next x position
-            ypos = 0
-            xpos += colspan
-
-
-    def adjust_spacing(self, wspace):
-        """
-        Adjust the horizontal spacing between columns
-
-        Parameters
-        ----------
-        wspace : float
-
-        """
-
-        plt.subplots_adjust(wspace=wspace)
-
-
-    def cleanup_grid(self):
-        """
-        Removes unnecessary spines from grid
-
-        """
-
-        for col, dataside, stackpos in zip(self.axes, self.dataside_list,
-                                           self.stackpos_list):
-
-            # Get mainax tick labelling settings
-            lleft, lright = self.mainax_ticks[stackpos]
-
-            # Set mainax tick parameters and positions
-            for ax in col:
-                ax.yaxis.set_tick_params(labelleft=lleft, labelright=lright)
-                ax.yaxis.set_ticks_position(stackpos)
-
-            data_ind, data_ax = self.pop_data_ax(col, dataside)
-
-            # Set tick marks and label position, spines
-            data_ax.xaxis.set_ticks_position(dataside)
-
-            for sp in self.spine_begone[stackpos][dataside]:
-                data_ax.spines[sp].set_visible(False)
-
-            for ax in col:
-                # Remove tick marks, tick labels
-                ax.xaxis.set_ticks_position('none')
-                plt.setp(ax.get_xticklabels(), visible=False)
-
-                # Remove spines
-                for sp in self.spine_begone[stackpos]['none']:
-                    ax.spines[sp].set_visible(False)
-
-            self.replace_data_ax(col, data_ind, data_ax)
+        self.twinds = None
+        self.twin_dim = None
+        self.reltwin_shifts = None
+        self.twin_shifts = None
+        self.dataside_list = self.dataside_list[:self.stackdim]
+        self.stackpos_list = self.stackpos_list[:self.stackdim]
+        self.axes = self.axes[:self.stackdim]
 
 
 def _ratios_arelists(ratios):
