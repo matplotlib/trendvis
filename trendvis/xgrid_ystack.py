@@ -103,6 +103,8 @@ class X_Grid(Grid):
             self.twinds.extend(rows_to_twin)
             self.twin_dim += len(rows_to_twin)
 
+        self.update_total_stackdim()
+
         for ind in rows_to_twin:
 
             twin_row = []
@@ -170,3 +172,81 @@ class X_Grid(Grid):
                 self.replace_data_ax(row, data_ind, data_ax)
 
         self.grid_isclean = True
+
+    def set_ticknums(self, xticks, yticks, logxscale='none', logyscale='none'):
+        """
+        Set the y and x axis scales, the y and x axis ticks (if linear), and
+            the tick number format.
+
+        Parameters
+        ----------
+        xticks : list of tuples
+            List of (major, minor) tick mark multiples.  Used to set major and
+            minor locators.  One tuple per x axis (original stack + twins)
+        yticks : list of tuples
+            List of (major, minor) tick mark multiples.  Used to set major and
+            minor locators.  One tuple per main axis.
+
+        Keyword Arguments
+        -----------------
+        logxscale : string or list of ints
+            Default 'none'.  ['none'|'all'|list of x-axis indices].
+            Indicate which x axes should be log scaled instead of linear.
+        logyscale : string or list of ints
+            Default 'none'.  ['none'|'all'|list of y-axis indices].
+            Indicate which y axes should be log scaled instead of linear.
+
+        """
+
+        xscale = self.make_lists(self.mainax_dim, logxscale,'linear', 'log')
+        yscale = self.make_lists(self.total_stackdim, logyscale,
+                                 'linear', 'log')
+
+        for row, yt, ysc in zip(self.axes, yticks, yscale):
+            for ax, xt in zip(row, xticks):
+
+                self.yaxis_ticknum(ax, ysc, yt, formatter)
+                self.xaxis_ticknum(ax, xscale, xt, formatter)
+
+    def ticknum_format(self, xformatter='%d', yformatter='%d'):
+        """
+        Set tick number formatters for x and/or y axes.
+
+        Keyword Arguments
+        -----------------
+        xformatter : string or list of strings
+            String formatting magic to apply to all x axes (string) or
+            individual x axes (list of strings, length = self.mainax_dim)
+        yformatter : string or list of strings
+            String formatting magic to apply to all y axes (string) or
+            individual y axes (list of strings, length = self.total_stackdim)
+
+        """
+
+        if xformatter is not None:
+            if type(xformatter) is str:
+                xfrmttr = FormatStrFormatter(xformatter)
+                xfrmttr_ls = [xfrmttr] * self.mainax_dim
+            else:
+                xfrmttr_ls = []
+                for xf in xformatter:
+                    xfrmttr = FormatStrFormatter(xf)
+                    xfrmttr_ls.append(xfrmttr)
+
+            for row in self.axes:
+                for ax, xf in zip(row, xfrmttr_ls):
+                    ax.xaxis.set_major_formatter(xf)
+
+        if yformatter is not None:
+            if type(yformatter) is str:
+                yfrmttr = FormatStrFormatter(yformatter)
+                yfrmttr_ls = [yfrmttr] * self.total_stackdim
+            else:
+                yfrmttr_ls = []
+                for yf in yformatter:
+                    yfrmttr = FormatStrFormatter(yf)
+                    yfrmttr_ls.append(yfrmttr)
+
+            for row, yf in zip(self.axes, yfrmttr_ls:
+                for ax in row:
+                    ax.yaxis.set_major_formatter(yf)

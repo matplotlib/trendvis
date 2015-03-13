@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 
 class Grid(object):
@@ -37,7 +38,7 @@ class Grid(object):
         self.stack_shifts = None
 
         self.twinds = None
-        self.twin_dim = None
+        self.twin_dim = 0
         self.reltwin_shifts = None
         self.twin_shifts = None
 
@@ -47,6 +48,7 @@ class Grid(object):
             self.mainax_id = 'x'
             self.stackedax_id = 'y'
             self.stackdim = self.numrows
+            self.mainax_dim = self.numcols
 
             self.startpos = 'top'
 
@@ -78,6 +80,7 @@ class Grid(object):
             self.mainax_id = 'y'
             self.stackax_id = 'x'
             self.stackdim = self.numcols
+            self.mainax_dim = self.numrows
 
             self.startpos = 'left'
 
@@ -105,6 +108,8 @@ class Grid(object):
                                  'both' : {'top' : ['bottom'],
                                            'bottom' : ['top'],
                                            'none' : ['top', 'bottom']}}
+
+        self.update_total_stackdim()
 
     def set_dataside(self, startside, alternate_sides):
         """
@@ -141,11 +146,19 @@ class Grid(object):
 
         """
 
-        if self.twin_dim is not None:
+        if self.twinds is not None:
             self.dataside_list = self.dataside_list[:self.stackdim]
             for ind in self.twinds:
                 twinside = self.alt_sides[self.dataside_list[ind]]
                 self.dataside_list.append(twinside)
+
+    def update_total_stackdim(self):
+        """
+        Update the number of combined original and twinned stacked axes.
+
+        """
+
+        self.total_stackdim = self.stackdim + self.twin_dim
 
     def set_stackposition(self, onespine_forboth):
         """
@@ -184,7 +197,11 @@ class Grid(object):
         -----------------
         axis_shift : float or list of floats
             Default None.  Set universal (float) or individual (list of
-                floats where len(axis_shift) = self.stackdim) axis spine shift
+            floats where len(axis_shift) = self.stackdim) axis spine shift
+        twin_shift : float or list of floats
+            Default None.  Set universal (float) or individual (list of
+            floats where len(twin_shift) = self.twin_dim) twinned axis spine
+            shift.
 
         """
 
@@ -271,6 +288,7 @@ class Grid(object):
         Reset all spines to normal position
 
         """
+
         shifts = {'x' : {'left'   : 0.0,
                          'right'  : 1.0},
                   'y' : {'bottom' : 0.0,
@@ -292,6 +310,13 @@ class Grid(object):
         """
         Pop out data axis from row or column
 
+        Parameters
+        ----------
+        subgrid : list of axes
+            Row or column of axes
+        side : string
+            The side that the visible stacked spine is on.
+
         """
 
         data_ind = self.side_inds[side]
@@ -302,6 +327,15 @@ class Grid(object):
     def replace_data_ax(self, subgrid, data_ind, data_ax):
         """
         Put data axis back in its original place in row or column
+
+        Parameters
+        ----------
+        subgrid : list of axes
+            Row or column of axes
+        data_ind : int
+            [0|-1].  The side that the visible stacked spine is on.
+        data_ax : axes instance
+            The axes instance from subgrid that has the visible stacked spine.
 
         """
 
@@ -327,7 +361,7 @@ class Grid(object):
 
     def remove_twins(self):
         """
-        Get rid of twinned axes
+        Get rid of twinned axes.
 
         """
 
@@ -336,13 +370,95 @@ class Grid(object):
                 self.fig.delaxes(ax)
 
         self.twinds = None
-        self.twin_dim = None
+        self.twin_dim = 0
         self.reltwin_shifts = None
         self.twin_shifts = None
         self.dataside_list = self.dataside_list[:self.stackdim]
         self.stackpos_list = self.stackpos_list[:self.stackdim]
         self.axes = self.axes[:self.stackdim]
 
+        self.update_total_stackdim()
+
+    def make_lists(self, dim, item, choice1, choice2):
+        """
+        Make a list choice1 and/or choice2 of length dim.
+
+        Parameters
+        ----------
+        dim : int
+            The length of the list, usually self.mainax_dim or
+            self.total_stackdim
+        item : string or list of ints
+            ['all'|'none'|list of indices].
+            Determines whether returned item_list is all choice1 ('none'),
+            all choice2 ('all'), or is choice1 with choice2 at given indices.
+
+        """
+
+        if item is 'none':
+            itemlist = [choice1] * dim
+        elif item is 'all':
+            itemlist = [choice2] * dim
+        else:
+            itemlist = []
+            for i in range(0, dim):
+                if i in item:
+                    itemlist.append(choice2)
+                else:
+                    itemlist.append(choice1)
+
+        return itemlist
+
+    def xaxis_ticknum(self, axis, scale, xticks):
+        """
+        Set x tick scale and, if linear, major and minor tick locators.
+
+        Parameters
+        ----------
+        axis : Axes instance
+            Axes instance to set x-axis scale and potentially
+            major and minor tick locators
+        scale : string
+            ['log'|'linear'].  X axis scale.
+        xticks : tuple
+            Tuple of (major, minor) x axis tick multiples.
+
+        """
+
+        axis.set_xcale(scale)
+
+        if scale is not 'log':
+
+            xmajor_loc = MultipleLocator(xticks[0])
+            xminor_loc = MultipleLocator(xticks[1])
+
+            axis.xaxis.set_major_locator(xmajor_loc)
+            axis.xaxis.set_minor_locator(xminor_loc)
+
+    def yaxis_ticknum(self, axis, scale, yticks):
+        """
+        Set y tick scale and, if linear, major and minor tick locators.
+
+        Parameters
+        ----------
+        axis : Axes instance
+            Axes instance to set y-axis scale and potentially
+            major and minor tick locators
+        scale : string
+            ['log'|'linear'].  Y axis scale.
+        xticks : tuple
+            Tuple of (major, minor) y axis tick multiples.
+
+        """
+
+        axis.set_yscale(scale)
+
+        if scale is not 'log':
+            ymajor_loc = MultipleLocator(yticks[0])
+            yminor_loc = MultipleLocator(yticks[1])
+
+            axis.yaxis.set_major_locator(ymajor_loc)
+            axis.yaxis.set_minor_locator(yminor_loc)
 
 def _ratios_arelists(ratios):
     """
