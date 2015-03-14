@@ -199,6 +199,13 @@ class Y_Grid(Grid):
 
         """
 
+        if len(xticks) != self.total_stackdim:
+            raise ValueError('xticks provided for ' + str(len(xticks)) + '/' +
+                             str(self.total_stackdim) + ' x-axes')
+        if len(yticks) != self.mainax_dim:
+            raise ValueError('yticks provided for ' + str(len(yticks)) + '/' +
+                             str(self.mainax_dim) + ' y-axes')
+
         xscale = self.make_lists(self.total_stackdim, logxscale,
                                  'linear', 'log')
         yscale = self.make_lists(self.mainax_dim, logyscale, 'linear', 'log')
@@ -251,3 +258,41 @@ class Y_Grid(Grid):
             for col in self.axes:
                 for ax, yf in zip(col, yfrmttr_ls):
                     ax.yaxis.set_major_formatter(yf)
+
+    def reverse_yaxis(self, reverse_y='all'):
+        """
+        Reverse all or any y axis.
+
+        Keyword Arguments
+        -----------------
+        reverse_y : string or list of ints
+            Default 'all'.  'all' or list of indices of the y axes to be
+            reversed accepted.
+
+        """
+
+        if reverse_y is 'all':
+            reverse_y = range(0, self.mainax_dim)
+
+        # Invert y axis of each axis in the first column
+        for r in reverse_y:
+            self.axes[0][r].invert_yaxis()
+
+    def reverse_xaxis(self, reverse_x='all'):
+        """
+        Reverse all or any x axis.
+
+        Keyword Arguments
+        -----------------
+        reverse_x : string or list of ints
+            Default 'all'.  'all' or list of indices of the x axes to be
+            reversed accepted.
+
+        """
+
+        if reverse_x is 'all':
+            reverse_x = range(0, self.total_stackdim)
+
+        # Invert x axis of first axis in each column
+        for r in reverse_x:
+            self.axes[r][0].invert_xaxis()
