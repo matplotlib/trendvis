@@ -425,7 +425,7 @@ class Grid(object):
 
         """
 
-        axis.set_xcale(scale)
+        axis.set_xscale(scale)
 
         if scale is not 'log':
 

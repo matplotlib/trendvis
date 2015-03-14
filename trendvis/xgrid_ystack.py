@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 from gridclass import Grid
 
 
@@ -182,10 +183,10 @@ class X_Grid(Grid):
         ----------
         xticks : list of tuples
             List of (major, minor) tick mark multiples.  Used to set major and
-            minor locators.  One tuple per x axis (original stack + twins)
+            minor locators.  One tuple per main axis
         yticks : list of tuples
             List of (major, minor) tick mark multiples.  Used to set major and
-            minor locators.  One tuple per main axis.
+            minor locators.  One tuple per y axis (original stack + twins)
 
         Keyword Arguments
         -----------------
@@ -203,10 +204,10 @@ class X_Grid(Grid):
                                  'linear', 'log')
 
         for row, yt, ysc in zip(self.axes, yticks, yscale):
-            for ax, xt in zip(row, xticks):
+            for ax, xt, xsc in zip(row, xticks, xscale):
 
-                self.yaxis_ticknum(ax, ysc, yt, formatter)
-                self.xaxis_ticknum(ax, xscale, xt, formatter)
+                self.yaxis_ticknum(ax, ysc, yt)
+                self.xaxis_ticknum(ax, xsc, xt)
 
     def ticknum_format(self, xformatter='%d', yformatter='%d'):
         """
@@ -247,6 +248,6 @@ class X_Grid(Grid):
                     yfrmttr = FormatStrFormatter(yf)
                     yfrmttr_ls.append(yfrmttr)
 
-            for row, yf in zip(self.axes, yfrmttr_ls:
+            for row, yf in zip(self.axes, yfrmttr_ls):
                 for ax in row:
                     ax.yaxis.set_major_formatter(yf)
