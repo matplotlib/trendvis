@@ -1,6 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+from matplotlib.ticker import MultipleLocator
 
 
 class Grid(object):
@@ -17,9 +15,9 @@ class Grid(object):
         ----------
         xratios : int or list of ints
             The relative sizes of the columns.  Not directly comparable
-            to yratios.
+            to yratios
         yratios : int or list of ints
-            The relative sizes of the rows.  Not directly comparable to xratios.
+            The relative sizes of the rows.  Not directly comparable to xratios
         mainax_x : Boolean
             [True|False].  Indicates if x is the main axis.  Determines
             some attributes
@@ -52,10 +50,10 @@ class Grid(object):
 
             self.startpos = 'top'
 
-            self.mainax_ticks = {'top' : ('on', 'off'),
-                                 'both' : ('on', 'on'),
-                                 'bottom' : ('off', 'on'),
-                                 'none' : ('off', 'off')}
+            self.mainax_ticks = {'top'   : ('on', 'off'),
+                                 'both'  : ('on', 'on'),
+                                 'bottom': ('off', 'on'),
+                                 'none'  : ('off', 'off')}
 
             self.alt_sides = {'left' : 'right',
                               'right': 'left'}
@@ -65,14 +63,16 @@ class Grid(object):
 
             self.spine_begone = {'top' : {'left' : ['bottom', 'right'],
                                           'right': ['bottom', 'left'],
-                                          'none' : ['bottom', 'left', 'right']},
+                                          'none' : ['bottom', 'left',
+                                                    'right']},
                                  'none' : {'left' : ['top', 'bottom', 'right'],
                                            'right': ['top', 'bottom', 'left'],
                                            'none' : ['top', 'bottom', 'left',
                                                      'right']},
                                  'bottom' : {'left' : ['top', 'right'],
                                              'right': ['top', 'left'],
-                                             'none' : ['top', 'left', 'right']},
+                                             'none' : ['top', 'left',
+                                                       'right']},
                                  'both' : {'left' : ['right'],
                                            'right': ['left'],
                                            'none' : ['right', 'left']}}
@@ -86,28 +86,31 @@ class Grid(object):
 
             self.mainax_ticks = {'left' : ('on', 'off'),
                                  'both' : ('on', 'on'),
-                                 'right' : ('off', 'on'),
+                                 'right': ('off', 'on'),
                                  'none' : ('off', 'off')}
 
-            self.alt_sides = {'top' : 'bottom',
+            self.alt_sides = {'top'   : 'bottom',
                               'bottom': 'top'}
 
-            self.side_inds = {'top' : 0,
+            self.side_inds = {'top'   : 0,
                               'bottom': -1}
 
             self.spine_begone = {'left' : {'top'   : ['bottom', 'right'],
-                                           'bottom' : ['top', 'right'],
-                                           'none' : ['bottom', 'top', 'right']},
-                                 'none' : {'top' :  ['bottom', 'left', 'right'],
-                                           'bottom' : ['top', 'left', 'right'],
+                                           'bottom': ['top', 'right'],
+                                           'none'  : ['bottom', 'top',
+                                                      'right']},
+                                 'none' : {'top'   : ['bottom', 'left',
+                                                      'right'],
+                                           'bottom': ['top', 'left', 'right'],
                                            'none'  : ['top', 'bottom', 'left',
                                                       'right']},
-                                 'right' : {'top' : ['bottom', 'left'],
-                                            'bottom' : ['top', 'left'],
-                                            'none' : ['top', 'bottom', 'left']},
-                                 'both' : {'top' : ['bottom'],
-                                           'bottom' : ['top'],
-                                           'none' : ['top', 'bottom']}}
+                                 'right' : {'top'   : ['bottom', 'left'],
+                                            'bottom': ['top', 'left'],
+                                            'none'  : ['top', 'bottom',
+                                                       'left']},
+                                 'both' : {'top'   : ['bottom'],
+                                           'bottom': ['top'],
+                                           'none'  : ['top', 'bottom']}}
 
         self.update_total_stackdim()
 
@@ -169,12 +172,12 @@ class Grid(object):
         ----------
         onespine_forboth : Boolean
             [True|False].  If the plot stack is only 1 row (column), then
-            both main axis spines may be used (False), or only the bottom (left)
-            spine.
+            both main axis spines may be used (False), or only the bottom
+            (left) spine.
 
         """
 
-        alt_pos = {'left' : 'right',
+        alt_pos = {'left': 'right',
                    'top' : 'bottom'}
 
         # Position list in the case of a stack of 1
@@ -186,7 +189,7 @@ class Grid(object):
 
         else:
             num_nones = self.stackdim - 2
-            self.stackpos_list = ([self.startpos] + ['none']*num_nones +
+            self.stackpos_list = ([self.startpos] + ['none'] * num_nones +
                                   [alt_pos[self.startpos]])
 
     def set_relative_axshift(self, axis_shift=None, twin_shift=None):
@@ -226,7 +229,7 @@ class Grid(object):
                 self.reltwin_shifts = [twin_shift] * self.twin_dim
             else:
                 if len(twin_shift) != self.twin_dim:
-                    print 'Warning:  len(twin_shift) != number of twinned axes!'
+                    print 'Warning:  len(twin_shift) != number of twinned ax!'
                     self.reltwin_shifts = [twin_shift[0]] * self.twin_dim
                 else:
                     self.reltwin_shifts = twin_shift
@@ -269,19 +272,19 @@ class Grid(object):
 
         if self.stack_shifts is not None:
 
-            for subgrid, dataside, shift in zip(self.axes, self.dataside_list,
-                                                 self.stack_shifts):
+            for subgrid, ds, sh in zip(self.axes, self.dataside_list,
+                                       self.stack_shifts):
 
                 for ax in subgrid:
-                    ax.spines[dataside].set_position(('axes', shift))
+                    ax.spines[ds].set_position(('axes', sh))
 
         if self.twin_shifts is not None:
 
-            for subgrid, dataside, shift in zip(self.axes[self.stackdim:],
-                                                self.dataside_list[self.stackdim:],
-                                                self.twin_shifts):
+            for subgrid, ds, sh in zip(self.axes[self.stackdim:],
+                                       self.dataside_list[self.stackdim:],
+                                       self.twin_shifts):
                 for ax in subgrid:
-                    ax.spines[dataside].set_position(('axes', shift))
+                    ax.spines[ds].set_position(('axes', sh))
 
     def reset_spineshift(self):
         """
@@ -292,7 +295,7 @@ class Grid(object):
         shifts = {'x' : {'left'   : 0.0,
                          'right'  : 1.0},
                   'y' : {'bottom' : 0.0,
-                          'top'   : 1.0}}
+                         'top'   : 1.0}}
 
         sd = shifts[self.mainax_id]
 
@@ -459,6 +462,7 @@ class Grid(object):
 
             axis.yaxis.set_major_locator(ymajor_loc)
             axis.yaxis.set_minor_locator(yminor_loc)
+
 
 def _ratios_arelists(ratios):
     """

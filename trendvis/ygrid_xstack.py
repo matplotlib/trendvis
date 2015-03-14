@@ -1,10 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 from gridclass import Grid
 
 
-class Y_Grid(Grid):
+class YGrid(Grid):
     """
     Class for making a plot with the Y axis as the main axis
         and a stack of x axes
@@ -20,9 +19,9 @@ class Y_Grid(Grid):
         ----------
         xratios : int or list of ints
             The relative sizes of the columns.  Not directly comparable
-            to yratios.
+            to yratios
         yratios : int or list of ints
-            The relative sizes of the rows.  Not directly comparable to xratios.
+            The relative sizes of the rows.  Not directly comparable to xratios
         figsize : tuple of ints or floats
             The figure dimensions in inches
 
@@ -150,7 +149,8 @@ class Y_Grid(Grid):
 
                 # Set mainax tick parameters and positions
                 for ax in col:
-                    ax.yaxis.set_tick_params(labelleft=lleft, labelright=lright)
+                    ax.yaxis.set_tick_params(labelleft=lleft,
+                                             labelright=lright)
                     ax.yaxis.set_ticks_position(stackpos)
 
                 data_ind, data_ax = self.pop_data_ax(col, dataside)
