@@ -47,9 +47,11 @@ class Grid(object):
 
         if mainax_x:
             self.mainax_id = 'x'
-            self.stackedax_id = 'y'
+            self.stackax_id = 'y'
             self.stackdim = self.numrows
             self.mainax_dim = self.numcols
+            self.sp1 = 'right'
+            self.sp2 = 'left'
 
             self.startpos = 'top'
 
@@ -84,6 +86,8 @@ class Grid(object):
             self.stackax_id = 'x'
             self.stackdim = self.numcols
             self.mainax_dim = self.numrows
+            self.sp1 = 'top'
+            self.sp2 = 'bottom'
 
             self.startpos = 'left'
 
@@ -252,7 +256,7 @@ class Grid(object):
             for shift, dataside in zip(self.relative_shifts,
                                        self.dataside_list):
 
-                if dataside is 'bottom' or dataside is 'left':
+                if dataside == self.sp2:
                     self.stack_shifts.append(0 - shift)
                 else:
                     self.stack_shifts.append(1 + shift)
@@ -262,7 +266,7 @@ class Grid(object):
 
             for shift, dataside in zip(self.reltwin_shifts,
                                        self.dataside_list[self.stackdim:]):
-                if dataside is 'bottom' or dataside is 'left':
+                if dataside == self.sp2:
                     self.twin_shifts.append(0 - shift)
                 else:
                     self.twin_shifts.append(1 + shift)
@@ -519,6 +523,32 @@ class Grid(object):
                                              width=tick_dim[1],
                                              labelsize=labelsize, pad=pad,
                                              direction=direction)
+
+    def set_axcolor(self, ax, color):
+        """
+        """
+
+        ax.tick_params(axis=self.stackax_id, color=color)
+        ax.spines[self.sp1].set_color(color)
+        ax.spines[self.sp2].set_color(color)
+
+    def autocolor_spines(self, which):
+        """
+
+        """
+
+        for subgrid in self.axes:
+            for ax in subgrid:
+                color = ax.get_lines()[which].get_color()
+                self.set_axcolor(ax, color)
+
+    def reset_spinecolor(self):
+        """
+        """
+
+        for subgrid in self.axes:
+            for ax in subgrid:
+                self.set_axcolor(ax, 'black')
 
 
 def _ratios_arelists(ratios):
