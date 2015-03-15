@@ -296,3 +296,52 @@ class YGrid(Grid):
         # Invert x axis of first axis in each column
         for r in reverse_x:
             self.axes[r][0].invert_xaxis()
+
+    def set_ticks(self, row='all', column='all', xy_axis='both', which='both',
+                  major_dim=(6 , 2), minor_dim=(4 , 1), labelsize=10, pad=10,
+                  major_tickdir='out', minor_tickdir='out'):
+        """
+        Set x and/or y axis ticks for all or specified axes.
+
+        Does not set axis color.
+
+        Keyword Arguments
+        -----------------
+        row : string or list of ints
+            Default 'all'.  The rows containing the axes that need tick
+            parameters adjusted, 'all' or list of indices
+        column: string or list of ints
+            Default 'all'.  The columns containing the axes that need tick
+            parameters adjusted, 'all' or list of indices
+        xy_axis : string
+            Default 'both'.  ['x'|'y'|'both']
+        which : string
+            Default 'both'.  ['major'|'minor'|'both'], the set of ticks
+            to adjust.
+        major_dim : tuple of ints or floats
+            Default (6, 2).  The (length, width) of the major ticks.
+        minor_dim : tuple of ints or floats
+            Default (4, 1).  The (length, width) of the minor ticks.
+        labelsize : int
+            Default 10.  Tick label fontsize.
+        pad : int
+            Default 10.  Spacing between the tick and tick label.
+        major_tickdir : string
+            Default 'out'.  ['out'|'in'|'inout'].  The major tick direction.
+        minor_tickdir : string
+            Default 'out'.  ['out'|'in'|'inout'].  The minor tick direction.
+
+        """
+
+        if row is 'all':
+            row = range(0, self.mainax_dim)
+        if column is 'all':
+            column = range(0, self.total_stackdim)
+
+        if which is not 'major':
+            Grid.set_ticks(self, column, row, xy_axis, 'minor', minor_dim,
+                           labelsize, pad, minor_tickdir)
+
+        if which is not 'minor':
+            Grid.set_ticks(self, column, row, xy_axis, 'major', major_dim,
+                           labelsize, pad, major_tickdir)

@@ -3,7 +3,7 @@ from matplotlib.ticker import MultipleLocator
 
 class Grid(object):
     """
-    Superlass for Y_Grid, X_Grid.
+    Superlass for YGrid, XGrid.
 
     """
 
@@ -41,6 +41,9 @@ class Grid(object):
         self.twin_shifts = None
 
         self.grid_isclean = False
+
+        self.spinelist = ['top', 'bottom', 'left', 'right']
+        self.spinewidth = 1
 
         if mainax_x:
             self.mainax_id = 'x'
@@ -353,14 +356,31 @@ class Grid(object):
 
         """
 
-        spinelist = ['top', 'bottom', 'left', 'right']
-
-        for row in self.axes:
-            for ax in row:
-                for sp in spinelist:
+        for subgrid in self.axes:
+            for ax in subgrid:
+                for sp in self.spinelist:
                     ax.spines[sp].set_visible(True)
 
         self.grid_isclean = False
+
+    def set_spinewidth(self, spinewidth):
+        """
+        Edit the linewidth of the axis spines.  Self.spinewidth also used
+            as the frame linewidth.
+
+        Parameters
+        ----------
+        spinewidth : int
+            Linewidth in points.
+
+        """
+
+        for subgrid in self.axes:
+            for ax in subgrid:
+                for sp in self.spinelist:
+                    ax.spines[sp].set_linewidth(spinewidth)
+
+        self.spinewidth = spinewidth
 
     def remove_twins(self):
         """
@@ -462,6 +482,43 @@ class Grid(object):
 
             axis.yaxis.set_major_locator(ymajor_loc)
             axis.yaxis.set_minor_locator(yminor_loc)
+
+    def set_ticks(self, subgrid_inds, ax_inds, xy_axis, which,
+                  tick_dim, labelsize, pad, direction):
+        """
+        Set the x and/or y axis major and/or minor ticks at the given
+            subgrid_inds, ax_inds locations.
+
+        Parameters
+        ----------
+        subgrid_inds : list of ints
+            The indices of the rows (XGrid) or columns (YGrid) containing
+            the axes that need tick parameters adjusted
+        ax_inds : list of ints
+            The indices of the axes within the indicated subgrids that need
+            tick parameters adjusted
+        xy_axis : string
+            ['x'|'y'|'both']
+        which : string
+            The set of ticks to adjust.  ['major'|'minor']
+        tick_dim : tuple of ints or floats
+            The (length, width) of `which` ticks.
+        labelsize : int
+            Tick label fontsize in points.
+        pad : int
+            Spacing between the tick and tick label in points.
+        direction : string
+            Tick direction.  ['in'|'out'|'inout']
+
+        """
+
+        for s in subgrid_inds:
+            for ax in ax_inds:
+                self.axes[s][ax].tick_params(axis=xy_axis, which=which,
+                                             length=tick_dim[0],
+                                             width=tick_dim[1],
+                                             labelsize=labelsize, pad=pad,
+                                             direction=direction)
 
 
 def _ratios_arelists(ratios):
