@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -19,7 +18,6 @@ def frame(fig, lowerleft_axis, upperright_axis, linewidth):
         Width of frame line.
 
     """
-
 
     # Data coordinates of lower left and upper right corners
     lldx = lowerleft_axis.get_xlim()[0]
@@ -50,7 +48,7 @@ def frame(fig, lowerleft_axis, upperright_axis, linewidth):
 
 
 def bar(fig, lowerleft_axis, upperright_axis, bar,
-         vertical):
+        vertical):
     """
     Draws vertical bars (called from ystack) or horizontal bars
         (called from xstack) across the subplots.
@@ -74,7 +72,7 @@ def bar(fig, lowerleft_axis, upperright_axis, bar,
 
     # Step through list of bars
     # for b in bars:
-        # Get data coordinates
+    # Get data coordinates
     if vertical:
         lldx = bar[0]
         lldy = lowerleft_axis.get_ylim()[0]
@@ -148,7 +146,6 @@ def cutout(axes, di, xratios, numcols, numrows):
 
     kwargs.update(transform=axes[numrows-1, numcols-1].transAxes)
     axes[numrows-1][numcols-1].plot((-d, d), (1-d, 1+d), **kwargs)
-
 
 
 def convert_coords(fig, lowerleft_axis, upperright_axis, lld, urd):
