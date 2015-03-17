@@ -526,6 +526,15 @@ class Grid(object):
 
     def set_axcolor(self, ax, color):
         """
+        Set the stacked ax spine and tick color of the given Axes.
+
+        Parameters
+        ----------
+        ax : Axes instance
+            Matplotlib axes instance.
+        color : string, tuple
+            Any color accepted by matplotlib.
+
         """
 
         ax.tick_params(axis=self.stackax_id, color=color)
@@ -534,16 +543,31 @@ class Grid(object):
 
     def autocolor_spines(self, which):
         """
+        Set the axis stacked ax spine and tick color based on the indicated
+            set of lines.
+
+        Parameters
+        ----------
+        which : int
+            Index of the line in each Axess instances' list of lines that
+            should be used to set the color.  Commonly 0 (stacked axes are same
+                color as first data plotted on axes instance) or -1 (stacked
+                axes are the same color as last data plotted on axes instance)
 
         """
 
         for subgrid in self.axes:
             for ax in subgrid:
-                color = ax.get_lines()[which].get_color()
+                try:
+                    color = ax.get_children()[2 + which].get_color()
+                except AttributeError:
+                    color = ax.get_children()[2 + which].get_facecolor()
                 self.set_axcolor(ax, color)
 
     def reset_spinecolor(self):
         """
+        Change all spine colors back to black
+
         """
 
         for subgrid in self.axes:
