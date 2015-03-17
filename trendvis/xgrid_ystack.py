@@ -297,6 +297,74 @@ class XGrid(Grid):
         for r in reverse_x:
             self.axes[0][r].invert_xaxis()
 
+    def set_ylim(self, ylim):
+        """
+        Set y limits.
+
+        Parameters
+        ----------
+        ylim : list of tuples of ints and/or floats
+            List of (row, min, max).  If ydim is 1, then row is ignored.
+            Also, if only one y axis needs ylim, can just pass the tuple
+
+        """
+
+        if self.total_stackdim == 1:
+            try:
+                ylim.extend([])
+            except AttributeError:
+                pass
+            else:
+                ylim = ylim[0]
+
+            for row in self.axes:
+                for ax in row:
+                    ax.set_ylim(ylim[-2], ylim[-1])
+
+        else:
+            try:
+                ylim.extend([])
+            except AttributeError:
+                ylim = [ylim]
+
+            for yl in ylim:
+                for ax in self.axes[yl[0]]:
+                    ax.set_ylim(yl[1], yl[2])
+
+    def set_xlim(self, xlim):
+        """
+        Set x limits.
+
+        Parameters
+        ----------
+        xlim : List of tuples of ints and/or flaots
+            List of (column, min, max).  If xdim is 1, then column is ignored.
+            Also, if only one x axis needs xlim, can just pass a tuple.
+
+        """
+
+        if self.mainax_dim == 1:
+            try:
+                xlim.extend([])
+            except AttributeError:
+                pass
+            else:
+                xlim = xlim[0]
+
+            for row in self.axes:
+                for ax in row:
+                    ax.set_xlim(xlim[-2], xlim[-1])
+
+        else:
+            try:
+                xlim.extend([])
+            except AttributeError:
+                xlim = [xlim]
+
+            for xl in xlim:
+                for row in self.axes:
+                    row[xl].set_xlim(xlim[1], xlim[2])
+
     def set_ticks(self, row='all', column='all', xy_axis='both', which='both',
                   major_dim=(6 , 2), minor_dim=(4 , 1), labelsize=10, pad=10,
                   major_dir='out', minor_dir='out'):
