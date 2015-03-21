@@ -367,6 +367,97 @@ class Grid(object):
 
         self.grid_isclean = False
 
+    def set_ax_visibility(self, subgrid_ind, ax_ind, which, visible):
+        """
+        Hide (`visible`=False) or show (`visible`=True) an axis side
+            (`which`).  Will hide/show spine, ticks, and ticklabels.
+
+        Parameters
+        ----------
+        subgrid_ind : int
+            The index of the row (column) holding the desired ax
+        ax_ind : int
+            The index of the column (row) within subgrid of the desired ax
+        which : string
+            The axis spine, ticks, ticklabels to hide/show.
+            ['left'|'right'|'top'|'bottom']
+        visible : Boolean
+            Set visible or invisible
+        """
+
+        ax = self.axes[subgrid_ind][ax_ind]
+
+        ax.spines[which].set_visible(visible)
+
+        if which is 'left' or which is 'right':
+            if visible:
+                ytick_dict = {'both'   : {'left' : 'both',
+                                          'right': 'both'},
+                              'left'   : {'left' : 'left',
+                                          'right': 'both'},
+                              'right'  : {'left' : 'both',
+                                          'right': 'right'},
+                              'unknown': {'left' : 'left',
+                                          'right': 'right'},
+                              'default': {'left' : 'both',
+                                          'right': 'both'}}
+            else:
+                ytick_dict = {'both'   : {'left' : 'right',
+                                          'right': 'left'},
+                              'left'   : {'left' : 'none',
+                                          'right': 'left'},
+                              'right'  : {'left' : 'right',
+                                          'right': 'none'},
+                              'unknown': {'left' : 'none',
+                                          'right': 'none'},
+                              'default': {'left' : 'right',
+                                          'right': 'left'}}
+            # Key is new tick pos, value is labelright, labelleft
+            ylabeldict = {'left' : ['off', 'on'],
+                          'right': ['on', 'off'],
+                          'both' : ['on', 'on'],
+                          'none' : ['off', 'off']}
+
+            old_tickpos = ax.yaxis.get_ticks_position()
+            new_tickpos = ytick_dict[old_tickpos][which]
+            ax.yaxis.set_ticks_position(new_tickpos)
+            r, f = ylabeldict[new_tickpos]
+            ax.yaxis.set_tick_params(labelright=r, labelleft=f)
+
+        if which is 'top' or which is 'bottom':
+            if visible:
+                xtick_dict = {'both'   : {'top'   : 'both',
+                                          'bottom': 'both'},
+                              'top'    : {'top'   : 'top',
+                                          'bottom': 'both'},
+                              'bottom' : {'top'   : 'both',
+                                          'bottom': 'bottom'},
+                              'unknown': {'top'   : 'top',
+                                          'bottom': 'bottom'},
+                              'default': {'top'   : 'both',
+                                          'bottom': 'both'}}
+            else:
+                xtick_dict = {'both'   : {'top'   : 'bottom',
+                                          'bottom': 'top'},
+                              'top'    : {'top'   : 'none',
+                                          'bottom': 'top'},
+                              'bottom' : {'top'   : 'bottom',
+                                          'bottom': 'none'},
+                              'unknown': {'top'   : 'none',
+                                          'bottom': 'none'},
+                              'default': {'top'   : 'bottom',
+                                          'bottom': 'top'}}
+            # Key is new tick pos, value is labeltop, labelbottom
+            xlabeldict = {'bottom': ['off', 'on'],
+                          'top'   : ['on', 'off'],
+                          'none'  : ['off', 'off']}
+
+            old_tickpos = ax.xaxis.get_ticks_position()
+            new_tickpos = xtick_dict[old_tickpos][which]
+            ax.xaxis.set_ticks_position(new_tickpos)
+            t, b = xlabeldict[new_tickpos]
+            ax.xaxis.set_tick_params(labeltop=t, labelbottom=b)
+
     def set_spinewidth(self, spinewidth):
         """
         Edit the linewidth of the axis spines.  Self.spinewidth also used

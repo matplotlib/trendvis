@@ -164,7 +164,7 @@ class YGrid(Grid):
                 for ax in col:
                     # Remove tick marks, tick labels
                     ax.xaxis.set_ticks_position('none')
-                    plt.setp(ax.get_xticklabels(), visible=False)
+                    ax.xaxis.set_tick_params(labeltop='off', labelbottom='off')
 
                     # Remove spines
                     for sp in self.spine_begone[stackpos]['none']:
@@ -173,6 +173,28 @@ class YGrid(Grid):
                 self.replace_data_ax(col, data_ind, data_ax)
 
         self.grid_isclean = True
+
+    def set_ax_visibility(self, col, row, which, visible):
+        """
+        Wrapper for Grid.set_ax_visibility().  Hide or show the spine,
+            ticks, and ticklabels of indicated side (`which`) for axis at
+            self.axes[row][col]
+
+        Parameters
+        ----------
+        col : int
+            Index of col containing desired ax
+        row : int
+            Index of row in col containing desired ax
+        which : string
+            The axis spine, ticks, ticklabels to hide/show.
+            ['left'|'right'|'top'|'bottom']
+        visible : Boolean
+            Set visible or invisible
+
+        """
+
+        Grid.set_ax_visibility(self, col, row, which, visible)
 
     def set_ticknums(self, xticks, yticks, logxscale='none', logyscale='none'):
         """
