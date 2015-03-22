@@ -271,9 +271,44 @@ class Grid(object):
                 else:
                     self.twin_shifts.append(1 + shift)
 
+    def move_one_spine(self, row, col, which, shift):
+        """
+        Move `which` stacked spine by `shift`.
+
+        Parameters
+        ----------
+        row : int
+            Row index.  Applied correctly as first (XGrid) or second (YGrid)
+            axes dimension.
+        col : int
+            Column index.  Applied correctly as first (YGrid) or
+            second (XGrid) axes dimension
+        which : string
+            If XGrid, ['left'|'right'], YGrid ['top'|'bottom'].
+            Used to indentify spine and to calculate outward shift
+            from `shift`.
+        shift : float
+            Relative change in position to figure size.
+
+        """
+
+        if self.mainax_id is 'x':
+            ax = self.axes[row][col]
+        else:
+            ax = self.axes[col][row]
+
+        if which is self.sp1:
+            shift = 1 + shift
+        elif which is self.sp2:
+            shift = 0 - shift
+        else:
+            raise ValueError('Not a stacked ax spine')
+
+        ax.spines['which'].set_position(('axes', shift))
+
     def move_spines(self):
         """
-        Move the stacked spines around
+        Move the stacked spines around.
 
         """
 
@@ -302,7 +337,7 @@ class Grid(object):
         shifts = {'x' : {'left'   : 0.0,
                          'right'  : 1.0},
                   'y' : {'bottom' : 0.0,
-                         'top'   : 1.0}}
+                         'top'    : 1.0}}
 
         sd = shifts[self.mainax_id]
 
@@ -367,25 +402,27 @@ class Grid(object):
 
         self.grid_isclean = False
 
-    def set_ax_visibility(self, subgrid_ind, ax_ind, which, visible):
+    def set_ax_visibility(self, row, col, which, visible):
         """
         Hide (`visible`=False) or show (`visible`=True) an axis side
             (`which`).  Will hide/show spine, ticks, and ticklabels.
 
         Parameters
         ----------
-        subgrid_ind : int
-            The index of the row (column) holding the desired ax
-        ax_ind : int
-            The index of the column (row) within subgrid of the desired ax
+        row : int
+            The index of the row holding the desired ax
+        col : int
+            The index of the column holding the  desired ax
         which : string
             The axis spine, ticks, ticklabels to hide/show.
             ['left'|'right'|'top'|'bottom']
         visible : Boolean
             Set visible or invisible
         """
-
-        ax = self.axes[subgrid_ind][ax_ind]
+        if self.mainax_id is 'x':
+            ax = self.axes[row][col]
+        else:
+            ax = self.axes[col][row]
 
         ax.spines[which].set_visible(visible)
 
@@ -635,7 +672,7 @@ class Grid(object):
     def autocolor_spines(self, which):
         """
         Set the axis stacked ax spine and tick color based on the indicated
-            set of lines.
+            plot color (accessed via ax.children[2: some number])
 
         Parameters
         ----------

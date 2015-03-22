@@ -174,28 +174,6 @@ class YGrid(Grid):
 
         self.grid_isclean = True
 
-    def set_ax_visibility(self, col, row, which, visible):
-        """
-        Wrapper for Grid.set_ax_visibility().  Hide or show the spine,
-            ticks, and ticklabels of indicated side (`which`) for axis at
-            self.axes[row][col]
-
-        Parameters
-        ----------
-        col : int
-            Index of col containing desired ax
-        row : int
-            Index of row in col containing desired ax
-        which : string
-            The axis spine, ticks, ticklabels to hide/show.
-            ['left'|'right'|'top'|'bottom']
-        visible : Boolean
-            Set visible or invisible
-
-        """
-
-        Grid.set_ax_visibility(self, col, row, which, visible)
-
     def set_ticknums(self, xticks, yticks, logxscale='none', logyscale='none'):
         """
         Set the y and x axis scales, the y and x axis ticks (if linear), and
