@@ -46,11 +46,24 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
         Default None.  List of (row, min, max).
         If ydim is 1, then row is ignored.
         Also, if only one y axis needs ylim, can just pass a tuple.
+    to_twin : list of ints
+        Default None.  The indices of the rows (columns) to twin
+    axis_shift : float or list of floats
+        Default None.  Universal (float) or individual (list of floats)
+        original axis spine relative shift.  Units are fraction of figure
+    twinax_shift : float or list of floats
+        Default None.  Universal (float) or individual (list of floats)
+        twinned axis spine relative shift.  Units are fraction of figure
+    tick_fontsize : int
+        Default 10.  The fontsize of tick labels.
 
+    Other Parameters
+    ----------------
+    kwargs : passed to plot_data(), then to axes.plot()
 
     Returns
     -------
-    grid : YGrid or XGrid object
+    grid : YGrid or XGrid instance
 
     """
 
@@ -97,26 +110,44 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
     grid.cleanup_grid()
 
     if plotdata is not None:
-        plot_data(plotdata, grid, **kwargs)
+        plot_data(grid, plotdata, **kwargs)
 
     return grid
 
 
-def plot_data(plotdata, grid, auto_spinecolor=True, marker='o', ls='-',
-              zorder=10, lw=1, elinewidth=1, capthick=1, capsize=3, **kwargs):
+def plot_data(grid, plotdata, auto_spinecolor=True, marker='o', ls='-',
+              zorder=10, lw=1, **kwargs):
     """
-    Plot a lot of data at once
+    Easy way to plot a lot of line data at once.  Other plotting calls
+        can be made by accessing individual axes in grid.axes
 
     Parameters
     ----------
+    grid : XGrid or YGrid instance
+        The Grid of axes on which to plot.
     plotdata : list of lists of tuples
-
-    grid
+        Default None. Tuple format: (x, y, color, {}, [ax inds within row/col])
+        One sublist per row or column (including twins).  To skip plotting on a
+        row or column, insert empty sublist at position corresponding to
+        the index of the row or column.
 
     Keyword Arguments
     -----------------
-    line_kwargs : dictionary
     auto_spinecolor : Boolean
+        If True, will color each stacked axis spines and ticks with the color
+        of the first plot on the axis.
+    marker : string
+        Default 'o'.  Any matplotlib marker.
+    ls : string
+        Default '-'. Any matplotlib linestyle.
+    zorder : int
+        Default 10.  The zorder of the plot.
+    lw : string
+        Default 1.  Linewidth in points.
+
+    Other Parameters
+    ----------------
+    kwargs : passed to axes.plot()
 
     """
 
@@ -125,22 +156,12 @@ def plot_data(plotdata, grid, auto_spinecolor=True, marker='o', ls='-',
             for dataset in subgrid_data:
                 try:
                     if ax_ind in dataset[4]:
-                        subgrid[ax_ind].errorbar(dataset[0], dataset[1],
-                                                 color=dataset[2],
-                                                 ecolor=dataset[2],
-                                                 marker=marker, ls=ls,
-                                                 zorder=zorder, lw=lw,
-                                                 capsize=capsize,
-                                                 capthick=capthick,
-                                                 elinewidth=elinewidth,
-                                                 **kwargs)
+                        subgrid[ax_ind].plot(dataset[0], dataset[1], lw=lw,
+                                             color=dataset[2], marker=marker,
+                                             ls=ls, zorder=zorder, **kwargs)
                 except:
-                    subgrid[ax_ind].errorbar(dataset[0], dataset[1],
-                                             color=dataset[2],
-                                             ecolor=dataset[2],
-                                             marker=marker, zorder=zorder,
-                                             capsize=capsize, lw=lw, ls=ls,
-                                             capthick=capthick,
-                                             elinewidth=elinewidth, **kwargs)
+                    subgrid[ax_ind].plot(dataset[0], dataset[1],
+                                         color=dataset[2], marker=marker,
+                                         zorder=zorder, lw=lw, ls=ls, **kwargs)
         if auto_spinecolor:
             grid.autocolor_spines(0)
