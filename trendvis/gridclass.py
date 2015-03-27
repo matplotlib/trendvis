@@ -9,7 +9,8 @@ class Grid(object):
 
     def __init__(self, xratios, yratios, mainax_x):
         """
-        Initialize grid attributes
+        Initialize grid attributes.  Should only be called through
+            XGrid, YGrid subclasses.
 
         Parameters
         ----------
@@ -367,7 +368,7 @@ class Grid(object):
 
         self.grid_isclean = False
 
-    def set_ax_visibility(self, subgrid_ind, ax_ind, which, visible):
+    def set_ax_visibility(self, ax, which, visible):
         """
         Hide (`visible`=False) or show (`visible`=True) an axis side
             (`which`).  Will hide/show spine, ticks, and ticklabels.
@@ -384,8 +385,6 @@ class Grid(object):
         visible : Boolean
             Set visible or invisible
         """
-
-        ax = self.axes[subgrid_ind][ax_ind]
 
         ax.spines[which].set_visible(visible)
 
@@ -423,6 +422,7 @@ class Grid(object):
             ax.yaxis.set_ticks_position(new_tickpos)
             r, f = ylabeldict[new_tickpos]
             ax.yaxis.set_tick_params(labelright=r, labelleft=f)
+            self.grid_isclean = False
 
         if which is 'top' or which is 'bottom':
             if visible:
@@ -457,6 +457,7 @@ class Grid(object):
             ax.xaxis.set_ticks_position(new_tickpos)
             t, b = xlabeldict[new_tickpos]
             ax.xaxis.set_tick_params(labeltop=t, labelbottom=b)
+            self.grid_isclean = False
 
     def set_spinewidth(self, spinewidth):
         """
@@ -527,7 +528,7 @@ class Grid(object):
 
         return itemlist
 
-    def xaxis_ticknum(self, axis, scale, xticks):
+    def xaxis_ticknum(self, axis, xticks, scale='linear'):
         """
         Set x tick scale and, if linear, major and minor tick locators.
 
@@ -536,10 +537,13 @@ class Grid(object):
         axis : Axes instance
             Axes instance to set x-axis scale and potentially
             major and minor tick locators
-        scale : string
-            ['log'|'linear'].  X axis scale.
         xticks : tuple
             Tuple of (major, minor) x axis tick multiples.
+
+        Keyword Arguments
+        -----------------
+        scale : string
+            Default 'linear'.  ['log'|'linear'].  X axis scale.
 
         """
 
@@ -553,7 +557,7 @@ class Grid(object):
             axis.xaxis.set_major_locator(xmajor_loc)
             axis.xaxis.set_minor_locator(xminor_loc)
 
-    def yaxis_ticknum(self, axis, scale, yticks):
+    def yaxis_ticknum(self, axis, yticks, scale='linear'):
         """
         Set y tick scale and, if linear, major and minor tick locators.
 
@@ -562,10 +566,13 @@ class Grid(object):
         axis : Axes instance
             Axes instance to set y-axis scale and potentially
             major and minor tick locators
-        scale : string
-            ['log'|'linear'].  Y axis scale.
         xticks : tuple
             Tuple of (major, minor) y axis tick multiples.
+
+        Keyword Arguments
+        -----------------
+        scale : string
+            Default 'linear'.  ['log'|'linear'].  Y axis scale.
 
         """
 

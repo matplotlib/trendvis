@@ -10,23 +10,25 @@ class XGrid(Grid):
 
     """
 
-    def __init__(self, xratios, yratios, figsize, startside='left',
-                 alternate_sides=True, onespine_forboth=False):
+    def __init__(self, ystack_ratios, xratios=1, figsize=(10, 10),
+                 startside='left', alternate_sides=True,
+                 onespine_forboth=False):
         """
         Initialize X_Grid
 
         Parameters
         ----------
-        xratios : int or list of ints
-            The relative sizes of the columns.  Not directly comparable
-            to yratios
-        yratios : int or list of ints
-            The relative sizes of the rows.  Not directly comparable to xratios
-        figsize : tuple of ints or floats
-            The figure dimensions in inches
+        ystack_ratiosratios : int or list of ints
+            The relative sizes of the rows.  Not directly comparable
+            to xratios
 
         Keyword Arguments
         -----------------
+        xratios : int or list of ints
+            Default 1. The relative sizes of the main axis column(s).
+            Not directly comparable to ystack_ratios
+        figsize : tuple of ints or floats
+            Default (10,10).  The figure dimensions in inches
         startside : string
             Default 'left'.  ['left'|'right'].  The side the topmost y axis
             will be on.
@@ -42,7 +44,7 @@ class XGrid(Grid):
 
         # Initialize parent class
         # Last arg is True because mainax_x
-        Grid.__init__(self, xratios, yratios, True)
+        Grid.__init__(self, xratios, ystack_ratios, True)
 
         # Set initial x and y grid positions (top left)
         xpos = 0
@@ -174,41 +176,112 @@ class XGrid(Grid):
 
         self.grid_isclean = True
 
-    def set_ax_visibility(self, row, col, which, visible):
+    def get_axis(self, ypos, xpos=0, is_twin=False, twinstance=0):
         """
-        Wrapper for Grid.set_ax_visibility().  Hide or show the spine,
-            ticks, and ticklabels of indicated side (`which`) for axis at
-            self.axes[row][col]
+        Get axis at a particular x, y location.
+
+        If a twin is desired, then there are two options:
+            1.  Set `ypos` to actual storage position in `self.axes`
+            2.  Set `ypos` to the physical position in XGrid, set is_twin=True,
+                and if there is more than one twin at that location, set
+                `twinstance` to indicate desired twin (e.g. 0 indicates the
+                first twin to be created in that row position)
+
+        For original axes, storage position and physical position are the same,
+            except if twins exist and negative `ypos` indices are used.
 
         Parameters
         ----------
-        row : int
-            Index of row containing desired ax
-        col : int
-            Index of column in row containing desired ax
-        which : string
-            The axis spine, ticks, ticklabels to hide/show.
-            ['left'|'right'|'top'|'bottom']
-        visible : Boolean
-            Set visible or invisible
+        ypos : int
+            The row that the axis is located in
+
+        Keyword Arguments
+        -----------------
+        xpos : int
+            Default 0.  The column the axis is in
+        is_twin : Boolean
+            Default False.  If is_twin, `self.get_axis()` will grab the twin at
+            the given physical xpos, ypos rather than the original axis.
+        twinstance : int
+            Default 0. If there is more than one twin at xpos, ypos, then
+            this will indicate which twin to grab
+
+        Returns
+        -------
+        ax : Axes instance
+            matplotlib axes instance at the given xpos, ypos, (twinstance)
 
         """
 
-        Grid.set_ax_visibility(self, row, col, which, visible)
+        if is_twin:
+            # ypos corresponds to twind(s), which are in a particular order
+            # Get indices of where ypos appears in the list of twins
+            twindices = [i for i, tw in enumerate(self.twinds) if tw == ypos]
+
+            # Get position of desired instance of ypos
+            which_twin = twindices[twinstance]
+
+            # New ypos is the original axis count, plus the location of twin
+            ypos = self.stackdim + which_twin
+
+        # Subgrid (row, y), ax (col, x)
+        ax = self.axes[ypos][xpos]
+
+        return ax
+
+    def get_twin_rownum(self, ypos, twinstance=None):
+        """
+        Original axes are easily located by row number in `self.axes`.
+            If there are multiple twins, finding those in `self.axes` may be
+            difficult, esp. if twins were created haphazardly.
+
+        This returns the index required by `self.axes` to fetch the
+            twin row.
+
+        Parameters
+        ----------
+        ypos : int
+            The row that was twinned
+
+        Keyword Arguments
+        -----------------
+        twinstance : int
+            Default None, print all twin row indices at `ypos`.  Indicates
+            which twin row index to print
+
+        """
+
+        twindices = [i for i, tw in enumerate(self.twinds) if tw == ypos]
+
+        if twinstance is None and len(twindices) > 1:
+            newypos = [i + self.stackdim for i in twindices]
+        elif twinstance is None:
+            newypos = [self.stackdim + twindices[0]]
+        else:
+            newypos = [self.stackdim + twindices[twinstance]]
+
+        print ('The twin(s) of row ' + str(ypos) + ' are stored in ' +
+               '`self.axes` as row(s):')
+
+        for ny in newypos:
+            print ny
 
     def set_ticknums(self, xticks, yticks, logxscale='none', logyscale='none'):
         """
         Set the y and x axis scales, the y and x axis ticks (if linear), and
-            the tick number format.
+            the tick number format.  Wrapper around Grid.yaxis_ticknum(),
+            Grid.xaxis_ticknum().
 
         Parameters
         ----------
         xticks : list of tuples
             List of (major, minor) tick mark multiples.  Used to set major and
-            minor locators.  One tuple per main axis
+            minor locators.  One tuple per main axis.
+            Use None to skip setting a major, minor MultipleLocator for an axis
         yticks : list of tuples
             List of (major, minor) tick mark multiples.  Used to set major and
-            minor locators.  One tuple per y axis (original stack + twins)
+            minor locators.  One tuple per y axis (original stack + twins).
+            Use None to skip setting a major, minor MultipleLocator for an axis
 
         Keyword Arguments
         -----------------
@@ -235,51 +308,60 @@ class XGrid(Grid):
         for row, yt, ysc in zip(self.axes, yticks, yscale):
             for ax, xt, xsc in zip(row, xticks, xscale):
 
-                self.yaxis_ticknum(ax, ysc, yt)
-                self.xaxis_ticknum(ax, xsc, xt)
+                if yt is not None or ysc is 'log':
+                    self.yaxis_ticknum(ax, ysc, yt)
+                if xt is not None or xsc is 'log':
+                    self.xaxis_ticknum(ax, xsc, xt)
 
-    def ticknum_format(self, xformatter='%d', yformatter='%d'):
+    def ticknum_format(self, ax='all', xformatter='%d', yformatter='%d'):
         """
         Set tick number formatters for x and/or y axes.
 
         Keyword Arguments
         -----------------
+        ax : string or axes instance
+            Default 'all', cycle through axes and set formatters.
+            If axes instance, will only set x and/or y formatter of that axes
+            instance.  Can acquire axis using self.get_axis()
         xformatter : string or list of strings
-            String formatting magic to apply to all x axes (string) or
-            individual x axes (list of strings, length = self.mainax_dim)
+            Default '%d'.  String formatting magic to apply to all x axes
+            Can use None to skip setting x formatter
         yformatter : string or list of strings
-            String formatting magic to apply to all y axes (string) or
-            individual y axes (list of strings, length = self.total_stackdim)
+            Default '%d'.  String formatting magic to apply to all y axes
+            (string) or individual y axes (list of strings,
+            length = self.total_stackdim).  Can use None to skip setting
+            y formatter, or insert None into list to skip setting  formatter
+            for a particular axis row
 
         """
 
-        if xformatter is not None:
-            if type(xformatter) is str:
+        if ax is not 'all':
+            if xformatter is not None:
                 xfrmttr = FormatStrFormatter(xformatter)
-                xfrmttr_ls = [xfrmttr] * self.mainax_dim
-            else:
-                xfrmttr_ls = []
-                for xf in xformatter:
-                    xfrmttr = FormatStrFormatter(xf)
-                    xfrmttr_ls.append(xfrmttr)
-
-            for row in self.axes:
-                for ax, xf in zip(row, xfrmttr_ls):
-                    ax.xaxis.set_major_formatter(xf)
-
-        if yformatter is not None:
-            if type(yformatter) is str:
+                ax.xaxis.set_major_formatter(xfrmttr)
+            if yformatter is not None:
                 yfrmttr = FormatStrFormatter(yformatter)
-                yfrmttr_ls = [yfrmttr] * self.total_stackdim
-            else:
-                yfrmttr_ls = []
-                for yf in yformatter:
-                    yfrmttr = FormatStrFormatter(yf)
-                    yfrmttr_ls.append(yfrmttr)
+                ax.yaxis.set_major_formatter(xfrmttr)
 
-            for row, yf in zip(self.axes, yfrmttr_ls):
-                for ax in row:
-                    ax.yaxis.set_major_formatter(yf)
+        else:
+            if yformatter is not None:
+                if type(yformatter) is str:
+                    yfrmttr = FormatStrFormatter(yformatter)
+                    for row in self.axes:
+                        for ax in row:
+                            ax.yaxis.set_major_formatter(yfrmttr)
+                else:
+                    for yf, row in zip(yformatter, self.axes):
+                        if yf is not None:
+                            yfrmttr = FormatStrFormatter(yf)
+                            for ax in row:
+                                ax.yaxis.set_major_formatter(yfrmttr)
+
+            if xformatter is not None:
+                xfrmttr = FormatStrFormatter(xformatter)
+                for row in self.axes:
+                    for ax in row:
+                        ax.xaxis.set_major_formatter(xfrmttr)
 
     def reverse_yaxis(self, reverse_y='all'):
         """
@@ -289,7 +371,8 @@ class XGrid(Grid):
         -----------------
         reverse_y : string or list of ints
             Default 'all'.  'all' or list of indices of the y axes to be
-            reversed accepted.
+            reversed accepted.  If unsure of index for a twin y axis in
+            `self.axes`, find using self.get_twin_rownum()
 
         """
 
@@ -327,7 +410,9 @@ class XGrid(Grid):
         ----------
         ylim : list of tuples of ints and/or floats
             List of (row, min, max).  If ydim is 1, then row is ignored.
-            Also, if only one y axis needs ylim, can just pass the tuple
+            Also, if only one y axis needs ylim, can just pass the tuple.
+            If unsure of row index for a twin y axis in `self.axes`,
+            find using self.get_twin_rownum()
 
         """
 
@@ -399,7 +484,9 @@ class XGrid(Grid):
         -----------------
         row : string or list of ints
             Default 'all'.  The rows containing the axes that need tick
-            parameters adjusted, 'all' or list of indices
+            parameters adjusted, 'all' or list of indices.  If unsure of row
+            index for a twin y axis in `self.axes`, find using
+            self.get_twin_rownum()
         column: string or list of ints
             Default 'all'.  The columns containing the axes that need tick
             parameters adjusted, 'all' or list of indices
