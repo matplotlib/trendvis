@@ -473,7 +473,7 @@ class YGrid(Grid):
                     col[yl].set_ylim(ylim[1], ylim[2])
 
     def set_ticks(self, row='all', column='all', xy_axis='both', which='both',
-                  major_dim=(6 , 2), minor_dim=(4 , 1), labelsize=10, pad=10,
+                  major_dim=(6, 2), minor_dim=(4, 1), labelsize=10, pad=10,
                   major_tickdir='out', minor_tickdir='out'):
         """
         Set x and/or y axis ticks for all or specified axes.

@@ -473,7 +473,7 @@ class XGrid(Grid):
                     row[xl].set_xlim(xlim[1], xlim[2])
 
     def set_ticks(self, row='all', column='all', xy_axis='both', which='both',
-                  major_dim=(6 , 2), minor_dim=(4 , 1), labelsize=10, pad=10,
+                  major_dim=(6, 2), minor_dim=(4, 1), labelsize=10, pad=10,
                   major_dir='out', minor_dir='out'):
         """
         Set x and/or y axis ticks for all or specified axes.
