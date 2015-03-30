@@ -522,3 +522,8 @@ class XGrid(Grid):
         if which is not 'minor':
             Grid.set_ticks(self, row, column, xy_axis, 'major', major_dim,
                            labelsize, pad, major_dir)
+
+    # def set_xlabels(self, xlabels, rows='all', fontsize=12, labelpad=12,
+    #                 rotation=0, **kwargs):
+    #     """
+    #     """
