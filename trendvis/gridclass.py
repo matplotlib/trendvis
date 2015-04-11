@@ -574,15 +574,16 @@ class Grid(object):
 
         """
 
-        axis.set_xscale(scale)
-
-        if scale is not 'log':
+        if scale is 'linear':
 
             xmajor_loc = MultipleLocator(xticks[0])
             xminor_loc = MultipleLocator(xticks[1])
 
             axis.xaxis.set_major_locator(xmajor_loc)
             axis.xaxis.set_minor_locator(xminor_loc)
+
+        else:
+            axis.set_xscale(scale)
 
     def yaxis_ticknum(self, axis, yticks, scale='linear'):
         """
@@ -603,14 +604,15 @@ class Grid(object):
 
         """
 
-        axis.set_yscale(scale)
-
-        if scale is not 'log':
+        if scale is 'linear':
             ymajor_loc = MultipleLocator(yticks[0])
             yminor_loc = MultipleLocator(yticks[1])
 
             axis.yaxis.set_major_locator(ymajor_loc)
             axis.yaxis.set_minor_locator(yminor_loc)
+
+        else:
+            axis.set_yscale(scale)
 
     def set_ticks(self, subgrid_inds, ax_inds, xy_axis, which,
                   tick_dim, labelsize, pad, direction):
@@ -662,7 +664,7 @@ class Grid(object):
 
         """
 
-        ax.tick_params(axis=self.stackax_id, color=color)
+        ax.tick_params(axis=self.stackax_id, color=color, which='both')
         ax.spines[self.sp1].set_color(color)
         ax.spines[self.sp2].set_color(color)
 
