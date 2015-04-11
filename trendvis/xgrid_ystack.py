@@ -309,9 +309,9 @@ class XGrid(Grid):
             for ax, xt, xsc in zip(row, xticks, xscale):
 
                 if yt is not None or ysc is 'log':
-                    self.yaxis_ticknum(ax, ysc, yt)
+                    self.yaxis_ticknum(ax, yt, ysc)
                 if xt is not None or xsc is 'log':
-                    self.xaxis_ticknum(ax, xsc, xt)
+                    self.xaxis_ticknum(ax, xt, xsc)
 
     def ticknum_format(self, ax='all', xformatter='%d', yformatter='%d'):
         """
