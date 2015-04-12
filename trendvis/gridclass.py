@@ -1,4 +1,5 @@
 from matplotlib.ticker import MultipleLocator
+import matplotlib.pyplot as plt
 
 
 class Grid(object):
@@ -25,8 +26,8 @@ class Grid(object):
 
         """
 
-        self.gridrows, self.yratios = _ratios_arelists(yratios)
-        self.gridcols, self.xratios = _ratios_arelists(xratios)
+        self.gridrows, self.yratios = self._ratios_arelists(yratios)
+        self.gridcols, self.xratios = self._ratios_arelists(xratios)
 
         self.numrows = len(self.yratios)
         self.numcols = len(self.xratios)
@@ -678,8 +679,8 @@ class Grid(object):
         which : int
             Index of the line in each Axess instances' list of lines that
             should be used to set the color.  Commonly 0 (stacked axes are same
-                color as first data plotted on axes instance) or -1 (stacked
-                axes are the same color as last data plotted on axes instance)
+            color as first data plotted on axes instance) or -1 (stacked
+            axes are the same color as last data plotted on axes instance)
 
         """
 
@@ -701,20 +702,115 @@ class Grid(object):
             for ax in subgrid:
                 self.set_axcolor(ax, 'black')
 
+    def draw_bar(self, ll_axis, ur_axis, bar_limits, orientation='vertical',
+                 zorder=-1, **kwargs):
+        """
+        Draws vertical or horizontal bars across the entire plot space.
 
-def _ratios_arelists(ratios):
-    """
-    Check if xratios, yratios are lists; rectify if not.
-        Private, only used internally in Grid class
+        If horizontal (vertical) bars are drawn on XGrid (YGrid), then
+            adjusting plot spacing afterwards will appear to displace bar,
+            because they are drawn on the figure and not the axes.
 
-    """
+        Parameters
+        ----------
+        ll_axis : matplotlib Axes instance
+        ur_axis : matplotlib Axes instance
+        bar_limits : tuple of ints or floats
+        orientation : string
+        kwargs
 
-    try:
-        rsum = sum(ratios)
-    except TypeError:
-        rsum = ratios
-        rlist = [ratios]
-    else:
-        rlist = ratios
+        """
 
-    return rsum, rlist
+        if orientation is 'vertical':
+            lldx, urdx = bar_limits
+            lldy = ll_axis.get_ylim()[0]
+            urdy = ur_axis.get_ylim()[1]
+        else:
+            lldy, urdy = bar_limits
+            lldx = ll_axis.get_xlim()[0]
+            urdx = ur_axis.get_xlim()[1]
+
+        ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
+        ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
+
+        width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
+
+        self.fig.patches.append(plt.Rectangle(ll_corner, width, height,
+                                              zorder=zorder,
+                                              transform=self.fig.transFigure,
+                                              **kwargs))
+
+    def draw_frame(self, lw='default', zorder=-1, edgecolor='black',
+                   facecolor='none', **kwargs):
+        """
+        """
+
+        last_instack = self.stackdim - 1
+        patchlist = self.fig.patches
+
+        if lw is 'default':
+            lw = self.spinewidth
+
+        for main in range(0, self.mainax_dim):
+            if self.mainax_id is 'x':
+                ll_axis = self.axes[last_instack][main]
+                ur_axis = self.axes[0][main]
+            else:
+                ll_axis = self.axes[0][main]
+                ur_axis = self.axes[last_instack][main]
+
+            lldx = ll_axis.get_xlim()[0]
+            lldy = ll_axis.get_ylim()[0]
+
+            urdx = ur_axis.get_xlim()[1]
+            urdy = ur_axis.get_ylim()[1]
+
+            ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
+            ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
+
+            width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
+
+            patchlist.append(plt.Rectangle(ll_corner, width, height,
+                                           zorder=zorder, facecolor=facecolor,
+                                           edgecolor=edgecolor, lw=lw,
+                                           transform=self.fig.transFigure,
+                                           **kwargs))
+
+    def _convert_coords(self, axis, coordinates):
+        """
+        Convert data coordinates to axis and figure coordinates
+
+        Parameters
+        ----------
+        ll_axis
+
+        Returns
+        -------
+        fig_coords
+
+        """
+
+        # Convert to axes coordinates
+        ax_coords = axis.transData.transform(coordinates)
+
+        # Convert to figure coordinates
+        fig_coords = self.fig.transFigure.inverted().transform(ax_coords)
+
+        return fig_coords
+
+    def _ratios_arelists(self, ratios):
+        """
+        Check if xratios, yratios are lists; rectify if not.
+            Private, only used internally in Grid class
+
+        """
+
+        try:
+            rsum = sum(ratios)
+        except TypeError:
+            rsum = ratios
+            rlist = [ratios]
+        else:
+            rlist = ratios
+
+        return rsum, rlist
