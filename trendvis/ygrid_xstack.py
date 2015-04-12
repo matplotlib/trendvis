@@ -1,3 +1,4 @@
+from __future__ import division
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 from gridclass import Grid
@@ -371,7 +372,8 @@ class YGrid(Grid):
         -----------------
         reverse_y : string or list of ints
             Default 'all'.  'all' or list of indices of the y axes to be
-            reversed accepted.
+            reversed accepted.  If unsure of index for a twin x axis in
+            `self.axes`, find using self.get_twin_colnum()
 
         """
 
@@ -522,3 +524,76 @@ class YGrid(Grid):
         if which is not 'minor':
             Grid.set_ticks(self, column, row, xy_axis, 'major', major_dim,
                            labelsize, pad, major_tickdir)
+
+    def draw_cutout(self, di=0.025, lw='default', **kwargs):
+        """
+        Draw cut marks on broken y axes.
+
+        Only drawn when self.mainax_dim > 1.
+
+        Parameters
+        ----------
+        di : float
+            Default 0.025.  The dimensions of the cutout mark as a
+            fraction of the smallest axis length.
+        lw : int
+            Default 'default'.  If default, lw = self.spinewidth.
+
+        """
+
+        if self.mainax_dim > 1:
+
+            # Adjust di so that cutouts will look exactly the same
+            # on every axis, no matter their relative sizes
+            miny = min(self.yratios)
+            y = [di * (miny / y) for y in self.yratios]
+
+            minx = min(self.xratios)
+            x0 = di * (minx / self.xratios[0])
+            x1 = di * (minx / self.xratios[-1])
+
+            left_x = (-x0, x0)
+            right_x = (1 - x1, 1 + x1)
+
+            right_ind = self.stackdim - 1
+
+            if lw is 'default':
+                lw = self.spinewidth
+
+            l_ax = self.axes[0][0]
+            r_ax = self.axes[right_ind][0]
+            lower = (-y[0], y[0])
+
+            # first axes in columns, lower only
+            kwargs = dict(transform=l_ax.transAxes, clip_on=False,
+                          color='black', lw=lw, **kwargs)
+            l_ax.plot(left_x, lower, **kwargs)
+
+            kwargs.update(transform=r_ax.transAxes)
+            r_ax.plot(right_x, lower, **kwargs)
+
+            # Middle axes
+            for i in range(1, self.mainax_dim - 1):
+                l_ax = self.axes[0][i]
+                r_ax = self.axes[right_ind][i]
+                upper = (1 - y[i], 1 + y[i])
+                lower = (-y[i], y[i])
+
+                kwargs.update(transform=l_ax.transAxes)
+                l_ax.plot(left_x, upper, **kwargs)
+                l_ax.plot(left_x, lower, **kwargs)
+
+                kwargs.update(transform=r_ax.transAxes)
+                r_ax.plot(right_x, upper, **kwargs)
+                r_ax.plot(right_x, lower, **kwargs)
+
+            # Last axes in columns, upper only
+            l_ax = self.axes[0][-1]
+            r_ax = self.axes[right_ind][-1]
+            upper = (1 - y[-1], 1 + y[-1])
+
+            kwargs.update(transform=l_ax.transAxes)
+            l_ax.plot(left_x, upper, **kwargs)
+
+            kwargs.update(transform=r_ax.transAxes)
+            r_ax.plot(right_x, upper, **kwargs)

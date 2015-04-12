@@ -1,3 +1,4 @@
+from __future__ import division
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 from gridclass import Grid
@@ -309,9 +310,9 @@ class XGrid(Grid):
             for ax, xt, xsc in zip(row, xticks, xscale):
 
                 if yt is not None or ysc is 'log':
-                    self.yaxis_ticknum(ax, yt, ysc)
+                    self.yaxis_ticknum(ax, yt, scale=ysc)
                 if xt is not None or xsc is 'log':
-                    self.xaxis_ticknum(ax, xt, xsc)
+                    self.xaxis_ticknum(ax, xt, scale=xsc)
 
     def ticknum_format(self, ax='all', xformatter='%d', yformatter='%d'):
         """
@@ -391,7 +392,8 @@ class XGrid(Grid):
         -----------------
         reverse_x : string or list of ints
             Default 'all'.  'all' or list of indices of the x axes to be
-            reversed accepted.
+            reversed accepted.  If unsure of index for a twin y axis in
+            `self.axes`, find using self.get_twin_rownum()
 
         """
 
@@ -522,6 +524,80 @@ class XGrid(Grid):
         if which is not 'minor':
             Grid.set_ticks(self, row, column, xy_axis, 'major', major_dim,
                            labelsize, pad, major_dir)
+
+    def draw_cutout(self, di=0.025, lw='default', **kwargs):
+        """
+        Draw cut marks on broken x axes.
+
+        Only drawn when self.mainax_dim > 1.
+
+        Parameters
+        ----------
+        di : float
+            Default 0.025.  The dimensions of the cutout mark as a
+            fraction of the smallest axis length.
+        lw : int
+            Default 'default'.  If default, lw = self.spinewidth.
+
+        """
+
+        if self.mainax_dim > 1:
+
+            # Adjust di so that cutouts will look exactly the same
+            # on every axis, no matter their relative sizes
+            minx = min(self.xratios)
+            x = [di * (minx / x) for x in self.xratios]
+
+            miny = min(self.yratios)
+            y0 = di * (miny / self.yratios[0])
+            y1 = di * (miny / self.yratios[-1])
+
+            # Upper and lower y position
+            upper_y = (1 - y0, 1 + y0)
+            lower_y = (-y1, y1)
+
+            low_ind = self.stackdim - 1
+
+            if lw is 'default':
+                lw = self.spinewidth
+
+            top_ax = self.axes[0][0]
+            low_ax = self.axes[low_ind][0]
+            right = (1 - x[0], 1 + x[0])
+
+            # first axes in rows, right only
+            kwargs = dict(transform=top_ax.transAxes, clip_on=False,
+                          color='black', lw=lw, **kwargs)
+            top_ax.plot(right, upper_y, **kwargs)
+
+            kwargs.update(transform=low_ax.transAxes)
+            low_ax.plot(right, lower_y, **kwargs)
+
+            # Middle axes
+            for i in range(1, self.mainax_dim - 1):
+                top_ax = self.axes[0][i]
+                low_ax = self.axes[low_ind][i]
+                left = (-x[i], x[i])
+                right = (1 - x[i], 1 + x[i])
+
+                kwargs.update(transform=top_ax.transAxes)
+                top_ax.plot(left, upper_y, **kwargs)
+                top_ax.plot(right, upper_y, **kwargs)
+
+                kwargs.update(transform=low_ax.transAxes)
+                low_ax.plot(left, lower_y, **kwargs)
+                low_ax.plot(right, lower_y, **kwargs)
+
+            # Last axes in rows, left only
+            top_ax = self.axes[0][-1]
+            low_ax = self.axes[low_ind][-1]
+            left = (-x[-1], x[-1])
+
+            kwargs.update(transform=top_ax.transAxes)
+            top_ax.plot(left, upper_y, **kwargs)
+
+            kwargs.update(transform=low_ax.transAxes)
+            low_ax.plot(left, lower_y, **kwargs)
 
     # def set_xlabels(self, xlabels, rows='all', fontsize=12, labelpad=12,
     #                 rotation=0, **kwargs):
