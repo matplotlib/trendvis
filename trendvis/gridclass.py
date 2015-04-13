@@ -1,3 +1,4 @@
+from __future__ import division
 from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
 
@@ -121,7 +122,7 @@ class Grid(object):
                                            'bottom': ['top'],
                                            'none'  : ['top', 'bottom']}}
 
-        self.update_total_stackdim()
+        self._update_total_stackdim()
 
     def set_dataside(self, startside, alternate_sides):
         """
@@ -149,28 +150,7 @@ class Grid(object):
         else:
             self.dataside_list = self.dataside_list * self.stackdim
 
-        self.update_twinsides()
-
-    def update_twinsides(self):
-        """
-        Update the sides that twinned axes appear on in the event of a
-            change to self.dataside_list.
-
-        """
-
-        if self.twinds is not None:
-            self.dataside_list = self.dataside_list[:self.stackdim]
-            for ind in self.twinds:
-                twinside = self.alt_sides[self.dataside_list[ind]]
-                self.dataside_list.append(twinside)
-
-    def update_total_stackdim(self):
-        """
-        Update the number of combined original and twinned stacked axes.
-
-        """
-
-        self.total_stackdim = self.stackdim + self.twin_dim
+        self._update_twinsides()
 
     def set_stackposition(self, onespine_forboth):
         """
@@ -205,7 +185,7 @@ class Grid(object):
         """
         Set universal or individual stacked axis spine relative shift
 
-        Keyword Arguments
+        Parameters
         -----------------
         axis_shift : float or list of floats
             Default None.  Set universal (float) or individual (list of
@@ -273,6 +253,28 @@ class Grid(object):
                 else:
                     self.twin_shifts.append(1 + shift)
 
+    def move_spines(self):
+        """
+        Move the stacked spines around.
+
+        """
+
+        if self.stack_shifts is not None:
+
+            for subgrid, ds, sh in zip(self.axes, self.dataside_list,
+                                       self.stack_shifts):
+
+                for ax in subgrid:
+                    ax.spines[ds].set_position(('axes', sh))
+
+        if self.twin_shifts is not None:
+
+            for subgrid, ds, sh in zip(self.axes[self.stackdim:],
+                                       self.dataside_list[self.stackdim:],
+                                       self.twin_shifts):
+                for ax in subgrid:
+                    ax.spines[ds].set_position(('axes', sh))
+
     def move_one_spine(self, ax, which, shift):
         """
         Move `which` stacked spine by `shift`.
@@ -300,28 +302,6 @@ class Grid(object):
 
         ax.spines['which'].set_position(('axes', shift))
 
-    def move_spines(self):
-        """
-        Move the stacked spines around.
-
-        """
-
-        if self.stack_shifts is not None:
-
-            for subgrid, ds, sh in zip(self.axes, self.dataside_list,
-                                       self.stack_shifts):
-
-                for ax in subgrid:
-                    ax.spines[ds].set_position(('axes', sh))
-
-        if self.twin_shifts is not None:
-
-            for subgrid, ds, sh in zip(self.axes[self.stackdim:],
-                                       self.dataside_list[self.stackdim:],
-                                       self.twin_shifts):
-                for ax in subgrid:
-                    ax.spines[ds].set_position(('axes', sh))
-
     def reset_spineshift(self):
         """
         Reset all spines to normal position
@@ -344,44 +324,6 @@ class Grid(object):
         self.stack_shifts = None
         self.reltwin_shifts = None
         self.twin_shifts = None
-
-    def pop_data_ax(self, subgrid, side):
-        """
-        Pop out data axis from row or column
-
-        Parameters
-        ----------
-        subgrid : list of axes
-            Row or column of axes
-        side : string
-            The side that the visible stacked spine is on.
-
-        """
-
-        data_ind = self.side_inds[side]
-        data_ax = subgrid.pop(data_ind)
-
-        return data_ind, data_ax
-
-    def replace_data_ax(self, subgrid, data_ind, data_ax):
-        """
-        Put data axis back in its original place in row or column
-
-        Parameters
-        ----------
-        subgrid : list of axes
-            Row or column of axes
-        data_ind : int
-            [0|-1].  The side that the visible stacked spine is on.
-        data_ax : axes instance
-            The axes instance from subgrid that has the visible stacked spine.
-
-        """
-
-        if data_ind == 0:
-            subgrid.insert(data_ind, data_ax)
-        else:
-            subgrid.append(data_ax)
 
     def replace_spines(self):
         """
@@ -524,9 +466,275 @@ class Grid(object):
         self.stackpos_list = self.stackpos_list[:self.stackdim]
         self.axes = self.axes[:self.stackdim]
 
-        self.update_total_stackdim()
+        self._update_total_stackdim()
 
-    def make_lists(self, dim, item, choice1, choice2):
+    def set_xaxis_ticknum(self, axis, xticks, scale='linear'):
+        """
+        Set x tick scale and, if linear, major and minor tick locators.
+
+        Parameters
+        ----------
+        axis : Axes instance
+            Axes instance to set x-axis scale and potentially
+            major and minor tick locators.  Can get with self.get_axis()
+        xticks : tuple
+            Tuple of (major, minor) x axis tick multiples.
+        scale : string
+            Default 'linear'.  ['log'|'linear'].  X axis scale.
+
+        """
+
+        if scale is 'linear':
+
+            xmajor_loc = MultipleLocator(xticks[0])
+            xminor_loc = MultipleLocator(xticks[1])
+
+            axis.xaxis.set_major_locator(xmajor_loc)
+            axis.xaxis.set_minor_locator(xminor_loc)
+
+        else:
+            axis.set_xscale(scale)
+
+    def set_yaxis_ticknum(self, axis, yticks, scale='linear'):
+        """
+        Set y tick scale and, if linear, major and minor tick locators.
+
+        Parameters
+        ----------
+        axis : Axes instance
+            Axes instance to set y-axis scale and potentially
+            major and minor tick locators.  Can get with self.get_axis()
+        xticks : tuple
+            Tuple of (major, minor) y axis tick multiples.
+        scale : string
+            Default 'linear'.  ['log'|'linear'].  Y axis scale.
+
+        """
+
+        if scale is 'linear':
+            ymajor_loc = MultipleLocator(yticks[0])
+            yminor_loc = MultipleLocator(yticks[1])
+
+            axis.yaxis.set_major_locator(ymajor_loc)
+            axis.yaxis.set_minor_locator(yminor_loc)
+
+        else:
+            axis.set_yscale(scale)
+
+    def autocolor_spines(self, which):
+        """
+        Set the axis stacked ax spine and tick color based on the indicated
+            plot color (accessed via ax.children[2: some number])
+
+        Parameters
+        ----------
+        which : int
+            Index of the line in each Axess instances' list of lines that
+            should be used to set the color.  Commonly 0 (stacked axes are same
+            color as first data plotted on axes instance) or -1 (stacked
+            axes are the same color as last data plotted on axes instance)
+
+        """
+
+        for subgrid in self.axes:
+            for ax in subgrid:
+                try:
+                    color = ax.get_children()[2 + which].get_color()
+                except AttributeError:
+                    color = ax.get_children()[2 + which].get_facecolor()
+                self.set_axcolor(ax, color)
+
+    def set_axcolor(self, ax, color):
+        """
+        Set the stacked ax spine and tick color of the given Axes.
+
+        Parameters
+        ----------
+        ax : Axes instance
+            Matplotlib axes instance.  Can get with self.get_axis()
+        color : string, tuple
+            Any color accepted by matplotlib.
+
+        """
+
+        ax.tick_params(axis=self.stackax_id, color=color, which='both')
+        ax.spines[self.sp1].set_color(color)
+        ax.spines[self.sp2].set_color(color)
+
+    def reset_spinecolor(self):
+        """
+        Change all spine colors back to black
+
+        """
+
+        for subgrid in self.axes:
+            for ax in subgrid:
+                self.set_axcolor(ax, 'black')
+
+    def draw_frame(self, lw='default', zorder=-1, edgecolor='black',
+                   facecolor='none', **kwargs):
+        """
+        Draw frame around each column (XGrid) or row (YGrid) of plot.
+            E.g., if self.mainax_dim == 1, then a frame will be drawn
+            around the whole figure, visually anhoring axes; if
+            self.mainax_dim > 1, then each mainax section will have
+            a frame drawn around it.
+
+        Parameters
+        ----------
+        lw : int
+            Default 'default'.  If default, then ``lw`` will be set to
+            ``self.spinewidth``.
+        zorder : int
+            Default -1.  The zorder of the frame.
+        edgecolor : string or tuple of floats
+            Default 'black'.  Any matplotlib-accepted color.
+        facecolor : string or tuple of floats
+            Default 'none'.  The background color.  Any matplotlib-accepted
+            color.
+        **kwargs
+            Passed to plt.Rectangle; any valid maplotlib.patches.Patch kwargs
+
+        """
+
+        last_instack = self.stackdim - 1
+        patchlist = self.fig.patches
+
+        if lw is 'default':
+            lw = self.spinewidth
+
+        for main in range(0, self.mainax_dim):
+            if self.mainax_id is 'x':
+                ll_axis = self.axes[last_instack][main]
+                ur_axis = self.axes[0][main]
+            else:
+                ll_axis = self.axes[0][main]
+                ur_axis = self.axes[last_instack][main]
+
+            lldx = ll_axis.get_xlim()[0]
+            lldy = ll_axis.get_ylim()[0]
+
+            urdx = ur_axis.get_xlim()[1]
+            urdy = ur_axis.get_ylim()[1]
+
+            ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
+            ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
+
+            width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
+
+            patchlist.append(plt.Rectangle(ll_corner, width, height,
+                                           zorder=zorder, facecolor=facecolor,
+                                           edgecolor=edgecolor, lw=lw,
+                                           transform=self.fig.transFigure,
+                                           **kwargs))
+
+    def draw_bar(self, ll_axis, ur_axis, bar_limits, orientation='vertical',
+                 zorder=-1, **kwargs):
+        """
+        Draws vertical or horizontal bars across the ENTIRE plot space,
+            anchoring them on opposite axes.
+
+        If horizontal (vertical) bars are drawn on XGrid (YGrid), then
+            adjusting plot spacing afterwards will appear to displace bar,
+            because they are drawn on the figure and not the axes.
+
+        Parameters
+        ----------
+        ll_axis : matplotlib Axes instance
+            The axis that will contain the lower left corner of the bar
+        ur_axis : matplotlib Axes instance
+            The axis that will contain the upper right corner of the bar
+        bar_limits : length 2 tuple of ints or floats,
+            The lower, upper data limits of the bar
+        orientation : string
+            Default 'vertical'.  Indicates the orientation of the long
+            axis of the bar
+        zorder : int
+            Default -1.  Zorder of the bar.
+        **kwargs
+            Passed to plt.Rectangle; any valid matplotlib.patches.Patch kwargs
+
+        """
+
+        if orientation is 'vertical':
+            lldx, urdx = bar_limits
+            lldy = ll_axis.get_ylim()[0]
+            urdy = ur_axis.get_ylim()[1]
+        else:
+            lldy, urdy = bar_limits
+            lldx = ll_axis.get_xlim()[0]
+            urdx = ur_axis.get_xlim()[1]
+
+        ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
+        ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
+
+        width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
+
+        self.fig.patches.append(plt.Rectangle(ll_corner, width, height,
+                                              zorder=zorder,
+                                              transform=self.fig.transFigure,
+                                              **kwargs))
+
+    def _update_twinsides(self):
+        """
+        Update the sides that twinned axes appear on in the event of a
+            change to self.dataside_list.
+
+        """
+
+        if self.twinds is not None:
+            self.dataside_list = self.dataside_list[:self.stackdim]
+            for ind in self.twinds:
+                twinside = self.alt_sides[self.dataside_list[ind]]
+                self.dataside_list.append(twinside)
+
+    def _update_total_stackdim(self):
+        """
+        Update the number of combined original and twinned stacked axes.
+
+        """
+
+        self.total_stackdim = self.stackdim + self.twin_dim
+
+    def _pop_data_ax(self, subgrid, side):
+        """
+        Pop out data axis from row or column
+
+        Parameters
+        ----------
+        subgrid : list of axes
+            Row or column of axes
+        side : string
+            The side that the visible stacked spine is on.
+
+        """
+
+        data_ind = self.side_inds[side]
+        data_ax = subgrid.pop(data_ind)
+
+        return data_ind, data_ax
+
+    def _replace_data_ax(self, subgrid, data_ind, data_ax):
+        """
+        Put data axis back in its original place in row or column
+
+        Parameters
+        ----------
+        subgrid : list of axes
+            Row or column of axes
+        data_ind : int
+            [0|-1].  The side that the visible stacked spine is on.
+        data_ax : axes instance
+            The axes instance from subgrid that has the visible stacked spine.
+
+        """
+
+        if data_ind == 0:
+            subgrid.insert(data_ind, data_ax)
+        else:
+            subgrid.append(data_ax)
+
+    def _make_lists(self, dim, item, choice1, choice2):
         """
         Make a list choice1 and/or choice2 of length dim.
 
@@ -556,67 +764,8 @@ class Grid(object):
 
         return itemlist
 
-    def xaxis_ticknum(self, axis, xticks, scale='linear'):
-        """
-        Set x tick scale and, if linear, major and minor tick locators.
-
-        Parameters
-        ----------
-        axis : Axes instance
-            Axes instance to set x-axis scale and potentially
-            major and minor tick locators.  Can get with self.get_axis()
-        xticks : tuple
-            Tuple of (major, minor) x axis tick multiples.
-
-        Keyword Arguments
-        -----------------
-        scale : string
-            Default 'linear'.  ['log'|'linear'].  X axis scale.
-
-        """
-
-        if scale is 'linear':
-
-            xmajor_loc = MultipleLocator(xticks[0])
-            xminor_loc = MultipleLocator(xticks[1])
-
-            axis.xaxis.set_major_locator(xmajor_loc)
-            axis.xaxis.set_minor_locator(xminor_loc)
-
-        else:
-            axis.set_xscale(scale)
-
-    def yaxis_ticknum(self, axis, yticks, scale='linear'):
-        """
-        Set y tick scale and, if linear, major and minor tick locators.
-
-        Parameters
-        ----------
-        axis : Axes instance
-            Axes instance to set y-axis scale and potentially
-            major and minor tick locators.  Can get with self.get_axis()
-        xticks : tuple
-            Tuple of (major, minor) y axis tick multiples.
-
-        Keyword Arguments
-        -----------------
-        scale : string
-            Default 'linear'.  ['log'|'linear'].  Y axis scale.
-
-        """
-
-        if scale is 'linear':
-            ymajor_loc = MultipleLocator(yticks[0])
-            yminor_loc = MultipleLocator(yticks[1])
-
-            axis.yaxis.set_major_locator(ymajor_loc)
-            axis.yaxis.set_minor_locator(yminor_loc)
-
-        else:
-            axis.set_yscale(scale)
-
-    def set_ticks(self, subgrid_inds, ax_inds, xy_axis, which,
-                  tick_dim, labelsize, pad, direction):
+    def _set_ticks(self, subgrid_inds, ax_inds, xy_axis, which,
+                   tick_dim, labelsize, pad, direction):
         """
         Set the x and/or y axis major and/or minor ticks at the given
             subgrid_inds, ax_inds locations.
@@ -652,141 +801,22 @@ class Grid(object):
                                              labelsize=labelsize, pad=pad,
                                              direction=direction)
 
-    def set_axcolor(self, ax, color):
-        """
-        Set the stacked ax spine and tick color of the given Axes.
-
-        Parameters
-        ----------
-        ax : Axes instance
-            Matplotlib axes instance.  Can get with self.get_axis()
-        color : string, tuple
-            Any color accepted by matplotlib.
-
-        """
-
-        ax.tick_params(axis=self.stackax_id, color=color, which='both')
-        ax.spines[self.sp1].set_color(color)
-        ax.spines[self.sp2].set_color(color)
-
-    def autocolor_spines(self, which):
-        """
-        Set the axis stacked ax spine and tick color based on the indicated
-            plot color (accessed via ax.children[2: some number])
-
-        Parameters
-        ----------
-        which : int
-            Index of the line in each Axess instances' list of lines that
-            should be used to set the color.  Commonly 0 (stacked axes are same
-            color as first data plotted on axes instance) or -1 (stacked
-            axes are the same color as last data plotted on axes instance)
-
-        """
-
-        for subgrid in self.axes:
-            for ax in subgrid:
-                try:
-                    color = ax.get_children()[2 + which].get_color()
-                except AttributeError:
-                    color = ax.get_children()[2 + which].get_facecolor()
-                self.set_axcolor(ax, color)
-
-    def reset_spinecolor(self):
-        """
-        Change all spine colors back to black
-
-        """
-
-        for subgrid in self.axes:
-            for ax in subgrid:
-                self.set_axcolor(ax, 'black')
-
-    def draw_bar(self, ll_axis, ur_axis, bar_limits, orientation='vertical',
-                 zorder=-1, **kwargs):
-        """
-        Draws vertical or horizontal bars across the entire plot space.
-
-        If horizontal (vertical) bars are drawn on XGrid (YGrid), then
-            adjusting plot spacing afterwards will appear to displace bar,
-            because they are drawn on the figure and not the axes.
-
-        Parameters
-        ----------
-        ll_axis : matplotlib Axes instance
-        ur_axis : matplotlib Axes instance
-        bar_limits : tuple of ints or floats
-        orientation : string
-        kwargs
-
-        """
-
-        if orientation is 'vertical':
-            lldx, urdx = bar_limits
-            lldy = ll_axis.get_ylim()[0]
-            urdy = ur_axis.get_ylim()[1]
-        else:
-            lldy, urdy = bar_limits
-            lldx = ll_axis.get_xlim()[0]
-            urdx = ur_axis.get_xlim()[1]
-
-        ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
-        ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
-
-        width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
-
-        self.fig.patches.append(plt.Rectangle(ll_corner, width, height,
-                                              zorder=zorder,
-                                              transform=self.fig.transFigure,
-                                              **kwargs))
-
-    def draw_frame(self, lw='default', zorder=-1, edgecolor='black',
-                   facecolor='none', **kwargs):
-        """
-        """
-
-        last_instack = self.stackdim - 1
-        patchlist = self.fig.patches
-
-        if lw is 'default':
-            lw = self.spinewidth
-
-        for main in range(0, self.mainax_dim):
-            if self.mainax_id is 'x':
-                ll_axis = self.axes[last_instack][main]
-                ur_axis = self.axes[0][main]
-            else:
-                ll_axis = self.axes[0][main]
-                ur_axis = self.axes[last_instack][main]
-
-            lldx = ll_axis.get_xlim()[0]
-            lldy = ll_axis.get_ylim()[0]
-
-            urdx = ur_axis.get_xlim()[1]
-            urdy = ur_axis.get_ylim()[1]
-
-            ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
-            ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
-
-            width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
-
-            patchlist.append(plt.Rectangle(ll_corner, width, height,
-                                           zorder=zorder, facecolor=facecolor,
-                                           edgecolor=edgecolor, lw=lw,
-                                           transform=self.fig.transFigure,
-                                           **kwargs))
-
     def _convert_coords(self, axis, coordinates):
         """
         Convert data coordinates to axis and figure coordinates
 
         Parameters
         ----------
-        ll_axis
+        axis : matplotlib Axes instance
+            The axes instance used to convert data coordinates into axes
+            and figure coordinates
+        coordinates : tuple of floats
+            Coordinates in the data coordinate system
 
         Returns
         -------
-        fig_coords
+        fig_coords : tuple of floats
+            Coordinates in the figure coordinate system
 
         """
 

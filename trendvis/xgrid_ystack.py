@@ -106,7 +106,7 @@ class XGrid(Grid):
             self.twinds.extend(rows_to_twin)
             self.twin_dim += len(rows_to_twin)
 
-        self.update_total_stackdim()
+        self._update_total_stackdim()
 
         for ind in rows_to_twin:
 
@@ -156,7 +156,7 @@ class XGrid(Grid):
                                              labelbottom=lbottom)
                     ax.xaxis.set_ticks_position(stackpos)
 
-                data_ind, data_ax = self.pop_data_ax(row, dataside)
+                data_ind, data_ax = self._pop_data_ax(row, dataside)
 
                 # Set tick marks and label position, spines
                 data_ax.yaxis.set_ticks_position(dataside)
@@ -173,7 +173,7 @@ class XGrid(Grid):
                     for sp in self.spine_begone[stackpos]['none']:
                         ax.spines[sp].set_visible(False)
 
-                self.replace_data_ax(row, data_ind, data_ax)
+                self._replace_data_ax(row, data_ind, data_ax)
 
         self.grid_isclean = True
 
@@ -267,11 +267,12 @@ class XGrid(Grid):
         for ny in newypos:
             print ny
 
-    def set_ticknums(self, xticks, yticks, logxscale='none', logyscale='none'):
+    def set_all_ticknums(self, xticks, yticks, logxscale='none',
+                         logyscale='none'):
         """
         Set the y and x axis scales, the y and x axis ticks (if linear), and
-            the tick number format.  Wrapper around Grid.yaxis_ticknum(),
-            Grid.xaxis_ticknum().
+            the tick number format.  Wrapper around Grid.set_yaxis_ticknum(),
+            Grid.set_xaxis_ticknum().
 
         Parameters
         ----------
@@ -302,17 +303,17 @@ class XGrid(Grid):
             raise ValueError('yticks provided for ' + str(len(yticks)) + '/' +
                              str(self.total_stackdim) + ' y-axes')
 
-        xscale = self.make_lists(self.mainax_dim, logxscale, 'linear', 'log')
-        yscale = self.make_lists(self.total_stackdim, logyscale,
-                                 'linear', 'log')
+        xscale = self._make_lists(self.mainax_dim, logxscale, 'linear', 'log')
+        yscale = self._make_lists(self.total_stackdim, logyscale,
+                                  'linear', 'log')
 
         for row, yt, ysc in zip(self.axes, yticks, yscale):
             for ax, xt, xsc in zip(row, xticks, xscale):
 
                 if yt is not None or ysc is 'log':
-                    self.yaxis_ticknum(ax, yt, scale=ysc)
+                    self.set_yaxis_ticknum(ax, yt, scale=ysc)
                 if xt is not None or xsc is 'log':
-                    self.xaxis_ticknum(ax, xt, scale=xsc)
+                    self.set_xaxis_ticknum(ax, xt, scale=xsc)
 
     def ticknum_format(self, ax='all', xformatter='%d', yformatter='%d'):
         """
@@ -518,12 +519,12 @@ class XGrid(Grid):
             column = range(0, self.mainax_dim)
 
         if which is not 'major':
-            Grid.set_ticks(self, row, column, xy_axis, 'minor', minor_dim,
-                           labelsize, pad, minor_dir)
+            Grid._set_ticks(self, row, column, xy_axis, 'minor', minor_dim,
+                            labelsize, pad, minor_dir)
 
         if which is not 'minor':
-            Grid.set_ticks(self, row, column, xy_axis, 'major', major_dim,
-                           labelsize, pad, major_dir)
+            Grid._set_ticks(self, row, column, xy_axis, 'major', major_dim,
+                            labelsize, pad, major_dir)
 
     def draw_cutout(self, di=0.025, lw='default', **kwargs):
         """
