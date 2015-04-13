@@ -589,3 +589,41 @@ class YGrid(Grid):
 
             kwargs.update(transform=r_ax.transAxes)
             r_ax.plot(right_x, upper, **kwargs)
+
+    def set_xlabels(self, xlabels, fontsize=14, labelpad=12, **kwargs):
+        """
+        Tool for setting all xlabels at once.  Can skip labelling an axis by
+            providing a ``None`` in corresponding poisition in list.
+
+        Parameters
+        ----------
+        xlabels : list of strings
+            The list of xlabels, one per x-axis.  Insert ``None`` in list to
+            skip an axis.
+        fontsize : int
+            Default 14.  The xlabel fontsize.
+        labelpad : int
+            Default 12.  The spacing between the tick labels adn the axis
+            labels.
+        **kwargs
+            Passed to ``axes.set_xlabel()``.
+            Any matplotlib ``Text`` properties
+
+        Notes
+        -----
+        Caution- this will set twin axis labels in the order that twins were
+            created, which may not correspond to physical position in grid.
+
+        """
+
+        for col, side, xl in zip(self.axes, self.dataside_list, xlabels):
+            if xl is not None:
+
+                if side == 'top':
+                    ind = 0
+                else:
+                    ind = -1
+
+                col[ind].xaxis.set_label_position(side)
+                col[ind].set_xlabel(xl, fontsize=fontsize,
+                                    labelpad=labelpad, **kwargs)
