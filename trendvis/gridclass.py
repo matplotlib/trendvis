@@ -5,22 +5,23 @@ import matplotlib.pyplot as plt
 
 class Grid(object):
     """
-    Superlass for YGrid, XGrid.
+    Superlass for ``YGrid``, ``XGrid``.
 
     """
 
     def __init__(self, xratios, yratios, mainax_x):
         """
         Initialize grid attributes.  Should only be called through
-            XGrid, YGrid subclasses.
+            ``XGrid``, ``YGrid`` subclasses.
 
         Parameters
         ----------
         xratios : int or list of ints
             The relative sizes of the columns.  Not directly comparable
-            to yratios
+            to ``yratios``
         yratios : int or list of ints
-            The relative sizes of the rows.  Not directly comparable to xratios
+            The relative sizes of the rows.  Not directly comparable to
+            ``xratios``
         mainax_x : Boolean
             [True|False].  Indicates if x is the main axis.  Determines
             some attributes
@@ -133,10 +134,10 @@ class Grid(object):
         ----------
         startside : string
             ['left'|'right'] or ['top'|'bottom'].  The side the first row
-            (column) in self.axes will have its y (x) axis spine on.
+            (column) in ``self.axes`` will have its y (x) axis spine on.
         alternate_sides : Boolean
             [True|False].  Stacked axis spines alternate sides or are all on
-            startside.
+            ``startside``.
 
         """
 
@@ -154,7 +155,7 @@ class Grid(object):
 
     def set_stackposition(self, onespine_forboth):
         """
-        Set the stackpos_list that indicates where the row or col is
+        Set ``self.stackpos_list`` that indicates where the row or col is
             in the grid
 
         Parameters
@@ -189,11 +190,12 @@ class Grid(object):
         -----------------
         axis_shift : float or list of floats
             Default None.  Set universal (float) or individual (list of
-            floats where len(axis_shift) = self.stackdim) axis spine shift
+            floats where len(``axis_shift``) = ``self.stackdim``)
+            axis spine shift
         twin_shift : float or list of floats
             Default None.  Set universal (float) or individual (list of
-            floats where len(twin_shift) = self.twin_dim) twinned axis spine
-            shift.
+            floats where len(``twin_shift``) = ``self.twin_dim``)
+            twinned axis spine shift.
 
         """
 
@@ -225,7 +227,7 @@ class Grid(object):
 
     def set_absolute_axshift(self):
         """
-        Translate self.relative_shifts to absolute values based on the
+        Translate ``self.relative_shifts`` to absolute values based on the
             corresponding plot side the axis will appear on
 
         """
@@ -277,19 +279,19 @@ class Grid(object):
 
     def move_one_spine(self, ax, which, shift):
         """
-        Move `which` stacked spine by `shift`.
+        Move ``which`` stacked ``ax`` spine by ``shift``.
 
         Parameters
         ----------
         ax : axes instance
             The axes instance which needs a spine moved.
-            Can be obtained via self.get_axis()
+            Can be obtained via ``self.get_axis()``
         which : string
-            If XGrid, ['left'|'right'], YGrid ['top'|'bottom'].
+            If ``XGrid``, ['left'|'right'], ``YGrid`` ['top'|'bottom'].
             Used to indentify spine and to calculate outward shift
-            from `shift`.
+            from ``shift``.
         shift : float
-            Relative change in position to figure size.
+            Change in position relative to figure size.
 
         """
 
@@ -327,7 +329,7 @@ class Grid(object):
 
     def replace_spines(self):
         """
-        Undo the spine-hiding actions of self.cleanup_grid()
+        Undo the spine-hiding actions of ``self.cleanup_grid()``
 
         """
 
@@ -340,14 +342,14 @@ class Grid(object):
 
     def set_ax_visibility(self, ax, which, visible):
         """
-        Hide (`visible`=False) or show (`visible`=True) an axis side
-            (`which`).  Will hide/show spine, ticks, and ticklabels.
+        Hide (``visible``=False) or show (``visible``=True) an axis side
+            (``which``).  Will hide/show spine, ticks, and ticklabels.
 
         Parameters
         ----------
         ax : axes instance
             The axes instance to set spine, tick visibility for.
-            Can be obtained via self.get_axis()
+            Can be obtained via ``self.get_axis()``
         which : string
             The axis spine, ticks, ticklabels to hide/show.
             ['left'|'right'|'top'|'bottom']
@@ -431,8 +433,8 @@ class Grid(object):
 
     def set_spinewidth(self, spinewidth):
         """
-        Edit the linewidth of the axis spines.  Self.spinewidth also used
-            as the frame linewidth.
+        Edit the linewidth of the axis spines.  ``self.spinewidth`` used as
+            default linewidths in drawing frames and cutouts.
 
         Parameters
         ----------
@@ -476,7 +478,7 @@ class Grid(object):
         ----------
         axis : Axes instance
             Axes instance to set x-axis scale and potentially
-            major and minor tick locators.  Can get with self.get_axis()
+            major and minor tick locators.  Can get with ``self.get_axis()``
         xticks : tuple
             Tuple of (major, minor) x axis tick multiples.
         scale : string
@@ -501,9 +503,9 @@ class Grid(object):
 
         Parameters
         ----------
-        axis : Axes instance
+        axis : matplotlib Axes instance
             Axes instance to set y-axis scale and potentially
-            major and minor tick locators.  Can get with self.get_axis()
+            major and minor tick locators.  Can get with ``self.get_axis()``
         xticks : tuple
             Tuple of (major, minor) y axis tick multiples.
         scale : string
@@ -524,15 +526,14 @@ class Grid(object):
     def autocolor_spines(self, which):
         """
         Set the axis stacked ax spine and tick color based on the indicated
-            plot color (accessed via ax.children[2: some number])
+            plot color (accessed via ``ax.children[2: some number]``)
 
         Parameters
         ----------
         which : int
-            Index of the line in each Axess instances' list of lines that
+            Index of the line in each Axes instances' list of lines that
             should be used to set the color.  Commonly 0 (stacked axes are same
-            color as first data plotted on axes instance) or -1 (stacked
-            axes are the same color as last data plotted on axes instance)
+            color as first data plotted on axes instance)
 
         """
 
@@ -550,9 +551,9 @@ class Grid(object):
 
         Parameters
         ----------
-        ax : Axes instance
-            Matplotlib axes instance.  Can get with self.get_axis()
-        color : string, tuple
+        ax : matplotlib axes instance
+            Can get with ``self.get_axis()``
+        color : string, tuple of floats
             Any color accepted by matplotlib.
 
         """
@@ -574,10 +575,10 @@ class Grid(object):
     def draw_frame(self, lw='default', zorder=-1, edgecolor='black',
                    facecolor='none', **kwargs):
         """
-        Draw frame around each column (XGrid) or row (YGrid) of plot.
-            E.g., if self.mainax_dim == 1, then a frame will be drawn
+        Draw frame around each column (``XGrid``) or row (``YGrid`) of plot.
+            E.g., if ``self.mainax_dim`` == 1, then a frame will be drawn
             around the whole figure, visually anhoring axes; if
-            self.mainax_dim > 1, then each mainax section will have
+            ``self.mainax_dim`` > 1, then each mainax section will have
             a frame drawn around it.
 
         Parameters
@@ -593,7 +594,8 @@ class Grid(object):
             Default 'none'.  The background color.  Any matplotlib-accepted
             color.
         **kwargs
-            Passed to plt.Rectangle; any valid maplotlib.patches.Patch kwargs
+            Passed to ``plt.Rectangle``; any valid
+            ``matplotlib.patches.Patch`` kwargs
 
         """
 
@@ -634,7 +636,7 @@ class Grid(object):
         Draws vertical or horizontal bars across the ENTIRE plot space,
             anchoring them on opposite axes.
 
-        If horizontal (vertical) bars are drawn on XGrid (YGrid), then
+        If horizontal (vertical) bars are drawn on ``XGrid`` (``YGrid``), then
             adjusting plot spacing afterwards will appear to displace bar,
             because they are drawn on the figure and not the axes.
 
@@ -652,7 +654,8 @@ class Grid(object):
         zorder : int
             Default -1.  Zorder of the bar.
         **kwargs
-            Passed to plt.Rectangle; any valid matplotlib.patches.Patch kwargs
+            Passed to ``plt.Rectangle``; any valid
+            ``matplotlib.patches.Patch`` kwargs
 
         """
 
@@ -678,7 +681,7 @@ class Grid(object):
     def _update_twinsides(self):
         """
         Update the sides that twinned axes appear on in the event of a
-            change to self.dataside_list.
+            change to ``self.dataside_list``.
 
         """
 
@@ -702,7 +705,7 @@ class Grid(object):
 
         Parameters
         ----------
-        subgrid : list of axes
+        subgrid : list of axes instances
             Row or column of axes
         side : string
             The side that the visible stacked spine is on.
@@ -725,7 +728,8 @@ class Grid(object):
         data_ind : int
             [0|-1].  The side that the visible stacked spine is on.
         data_ax : axes instance
-            The axes instance from subgrid that has the visible stacked spine.
+            The axes instance from ``subgrid`` that has the
+            visible stacked spine.
 
         """
 
@@ -741,12 +745,22 @@ class Grid(object):
         Parameters
         ----------
         dim : int
-            The length of the list, usually self.mainax_dim or
-            self.total_stackdim
+            The length of the list, usually ``self.mainax_dim`` or
+            ``self.total_stackdim``
         item : string or list of ints
             ['all'|'none'|list of indices].
-            Determines whether returned item_list is all choice1 ('none'),
-            all choice2 ('all'), or is choice1 with choice2 at given indices.
+            Determines whether returned ``itemlist`` is all ``choice1``
+             ('none'), all ``choice2`` ('all'), or is
+             ``choice1`` with ``choice2`` at given indices.
+        choice1 : any object instance
+            One of the items to potentially make a list of
+        choice2 : any object instance
+            The other item to potentially create a list of
+
+        Returns
+        -------
+        itemlist : list
+            List of some comination of ``choice1``, ``choice2``
 
         """
 
@@ -816,7 +830,7 @@ class Grid(object):
         Returns
         -------
         fig_coords : tuple of floats
-            Coordinates in the figure coordinate system
+            ``coordinates`` translated to the figure coordinate system
 
         """
 
@@ -830,8 +844,7 @@ class Grid(object):
 
     def _ratios_arelists(self, ratios):
         """
-        Check if xratios, yratios are lists; rectify if not.
-            Private, only used internally in Grid class
+        Check if ``ratios`` are lists; rectify if not.
 
         """
 

@@ -22,9 +22,6 @@ class YGrid(Grid):
         xstack_ratios : int or list of ints
             The relative sizes of the columns.  Not directly comparable
             to yratios
-
-        Keyword Arguments
-        -----------------
         yratios : int or list of ints
             Default 1.  The relative sizes of the main axis row(s).
             Not directly comparable to xstack_ratios
@@ -195,9 +192,6 @@ class YGrid(Grid):
         ----------
         xpos : int
             The column that the axis is located in.
-
-        Keyword Arguments
-        -----------------
         ypos : int
             Default 0.  The row the axis is in.
         is_twin : Boolean
@@ -243,9 +237,6 @@ class YGrid(Grid):
         ----------
         xpos : int
             The column that was twinned
-
-        Keyword Arguments
-        -----------------
         twinstance : int
             Default None, print all twin column indices at `xpos`.  Indicates
             which twin column index to print
@@ -267,7 +258,8 @@ class YGrid(Grid):
         for nx in newxpos:
             print nx
 
-    def set_ticknums(self, xticks, yticks, logxscale='none', logyscale='none'):
+    def set_all_ticknums(self, xticks, yticks, logxscale='none',
+                         logyscale='none'):
         """
         Set the y and x axis scales, the y and x axis ticks (if linear), and
             the tick number format.  Wrapper around Grid.set_yaxis_ticknum(),
@@ -283,9 +275,6 @@ class YGrid(Grid):
             List of (major, minor) tick mark multiples.  Used to set major and
             minor locators.  One tuple per main axis.
             Use None to skip setting a major, minor MultipleLocator for an axis
-
-        Keyword Arguments
-        -----------------
         logxscale : string or list of ints
             Default 'none'.  ['none'|'all'|list of x-axis indices].
             Indicate which x axes should be log scaled instead of linear.
@@ -318,8 +307,8 @@ class YGrid(Grid):
         """
         Set tick number formatters for x and/or y axes.
 
-        Keyword Arguments
-        -----------------
+        Parameters
+        ----------
         ax : string or axes instance
             Default 'all', cycle through axes and set formatters.
             If axes instance, will only set x and/or y formatter of that axes
@@ -368,8 +357,8 @@ class YGrid(Grid):
         """
         Reverse all or any y axis.
 
-        Keyword Arguments
-        -----------------
+        Parameters
+        ----------
         reverse_y : string or list of ints
             Default 'all'.  'all' or list of indices of the y axes to be
             reversed accepted.  If unsure of index for a twin x axis in
@@ -388,8 +377,8 @@ class YGrid(Grid):
         """
         Reverse all or any x axis.
 
-        Keyword Arguments
-        -----------------
+        Parameters
+        ----------
         reverse_x : string or list of ints
             Default 'all'.  'all' or list of indices of the x axes to be
             reversed accepted.  If unsure of index for a twin x axis in
@@ -482,8 +471,8 @@ class YGrid(Grid):
 
         Does not set axis color.
 
-        Keyword Arguments
-        -----------------
+        Parameters
+        ----------
         row : string or list of ints
             Default 'all'.  The rows containing the axes that need tick
             parameters adjusted, 'all' or list of indices
@@ -538,6 +527,8 @@ class YGrid(Grid):
             fraction of the smallest axis length.
         lw : int
             Default 'default'.  If default, lw = self.spinewidth.
+        **kwargs
+            Passed to ``axes.plot()``.  Any valid kwargs.
 
         """
 
@@ -552,6 +543,7 @@ class YGrid(Grid):
             x0 = di * (minx / self.xratios[0])
             x1 = di * (minx / self.xratios[-1])
 
+            # Left and right x position
             left_x = (-x0, x0)
             right_x = (1 - x1, 1 + x1)
 

@@ -22,9 +22,6 @@ class XGrid(Grid):
         ystack_ratiosratios : int or list of ints
             The relative sizes of the rows.  Not directly comparable
             to xratios
-
-        Keyword Arguments
-        -----------------
         xratios : int or list of ints
             Default 1. The relative sizes of the main axis column(s).
             Not directly comparable to ystack_ratios
@@ -195,9 +192,6 @@ class XGrid(Grid):
         ----------
         ypos : int
             The row that the axis is located in
-
-        Keyword Arguments
-        -----------------
         xpos : int
             Default 0.  The column the axis is in
         is_twin : Boolean
@@ -243,9 +237,6 @@ class XGrid(Grid):
         ----------
         ypos : int
             The row that was twinned
-
-        Keyword Arguments
-        -----------------
         twinstance : int
             Default None, print all twin row indices at `ypos`.  Indicates
             which twin row index to print
@@ -284,9 +275,6 @@ class XGrid(Grid):
             List of (major, minor) tick mark multiples.  Used to set major and
             minor locators.  One tuple per y axis (original stack + twins).
             Use None to skip setting a major, minor MultipleLocator for an axis
-
-        Keyword Arguments
-        -----------------
         logxscale : string or list of ints
             Default 'none'.  ['none'|'all'|list of x-axis indices].
             Indicate which x axes should be log scaled instead of linear.
@@ -319,8 +307,8 @@ class XGrid(Grid):
         """
         Set tick number formatters for x and/or y axes.
 
-        Keyword Arguments
-        -----------------
+        Parameters
+        ----------
         ax : string or axes instance
             Default 'all', cycle through axes and set formatters.
             If axes instance, will only set x and/or y formatter of that axes
@@ -369,8 +357,8 @@ class XGrid(Grid):
         """
         Reverse all or any y axis.
 
-        Keyword Arguments
-        -----------------
+        Parameters
+        ----------
         reverse_y : string or list of ints
             Default 'all'.  'all' or list of indices of the y axes to be
             reversed accepted.  If unsure of index for a twin y axis in
@@ -389,8 +377,8 @@ class XGrid(Grid):
         """
         Reverse all or any x axis.
 
-        Keyword Arguments
-        -----------------
+        Parameters
+        ----------
         reverse_x : string or list of ints
             Default 'all'.  'all' or list of indices of the x axes to be
             reversed accepted.  If unsure of index for a twin y axis in
@@ -483,8 +471,8 @@ class XGrid(Grid):
 
         Does not set axis color.
 
-        Keyword Arguments
-        -----------------
+        Parameters
+        ----------
         row : string or list of ints
             Default 'all'.  The rows containing the axes that need tick
             parameters adjusted, 'all' or list of indices.  If unsure of row
@@ -530,7 +518,7 @@ class XGrid(Grid):
         """
         Draw cut marks on broken x axes.
 
-        Only drawn when self.mainax_dim > 1.
+        Only drawn when ``self.mainax_dim`` > 1.
 
         Parameters
         ----------
@@ -539,6 +527,8 @@ class XGrid(Grid):
             fraction of the smallest axis length.
         lw : int
             Default 'default'.  If default, lw = self.spinewidth.
+        **kwargs
+            Passed to ``axes.plot()``.  Any valid kwargs.
 
         """
 
