@@ -13,29 +13,13 @@ bars, or rectangles of interest.
 
 """
 
-__all__ = ['broken_x',
-           'discrete_colorplot',
-           'set_xticks',
-           'set_yticks',
-           'reorder_sort',
-           'reorder_index',
-           'multi_y',
-           'multi_x',
-           'frame',
-           'bar',
-           'cutout',
-           'convert_coords']
+__all__ = ['XGrid',
+           'YGrid',
+           'make_grid',
+           'plot_data']
 
-from .ystack_brokenx import broken_x
+from .xgrid_ystack import XGrid
 
-from .colorplots import discrete_colorplot
+from .ygrid_xstack import YGrid
 
-from .plot_accessory import (set_yticks, set_xticks,
-                             reorder_bysort as reorder_sort,
-                             reorder_byindex as reorder_index)
-
-from .ystack import multi_y
-
-from .xstack import multi_x
-
-from .draw import frame, bar, cutout, convert_coords
+from .gridwrapper import make_grid, plot_data
