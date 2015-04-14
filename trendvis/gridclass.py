@@ -302,7 +302,7 @@ class Grid(object):
         else:
             raise ValueError('Not a stacked ax spine')
 
-        ax.spines['which'].set_position(('axes', shift))
+        ax.spines[which].set_position(('axes', shift))
 
     def reset_spineshift(self):
         """
