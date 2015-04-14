@@ -117,6 +117,11 @@ class YGrid(Grid):
             twinside = self.alt_sides[self.dataside_list[ind]]
             self.dataside_list.append(twinside)
             self.stackpos_list.append('none')
+
+            # Make the x axes shared
+            if len(twin_col) > 1:
+                twin_col.get_shared_x_axes().join(*twin_col)
+
             self.axes.append(twin_col)
 
         self.grid_isclean = False
@@ -544,8 +549,8 @@ class YGrid(Grid):
             x1 = di * (minx / self.xratios[-1])
 
             # Left and right x position
-            left_x = (-x0, x0)
-            right_x = (1 - x1, 1 + x1)
+            left_x = (-(2 * x0), (2 * x0))
+            right_x = (1 - (2 * x1), 1 + (2 * x1))
 
             right_ind = self.stackdim - 1
 

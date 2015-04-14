@@ -117,6 +117,11 @@ class XGrid(Grid):
             twinside = self.alt_sides[self.dataside_list[ind]]
             self.dataside_list.append(twinside)
             self.stackpos_list.append('none')
+
+            # Make the y-axes shared
+            if len(twin_row) > 1:
+                twin_row[0].get_shared_y_axes().join(*twin_row)
+
             self.axes.append(twin_row)
 
         self.grid_isclean = False
@@ -544,8 +549,8 @@ class XGrid(Grid):
             y1 = di * (miny / self.yratios[-1])
 
             # Upper and lower y position
-            upper_y = (1 - y0, 1 + y0)
-            lower_y = (-y1, y1)
+            upper_y = (1 - (2 * y0), 1 + (2 * y0))
+            lower_y = (-(2 * y1), (2 * y1))
 
             low_ind = self.stackdim - 1
 
