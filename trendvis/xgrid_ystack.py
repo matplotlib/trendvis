@@ -533,7 +533,7 @@ class XGrid(Grid):
         lw : int
             Default 'default'.  If default, lw = self.spinewidth.
         **kwargs
-            Passed to ``axes.plot()``.  Any valid kwargs.
+            Passed to ``axis.plot()``.  Any valid kwargs.
 
         """
 
@@ -611,7 +611,7 @@ class XGrid(Grid):
             Default 12.  The spacing between the tick labels and the axis
             labels.
         **kwargs
-            Passed to ``axes.set_ylabel()``.
+            Passed to ``axis.set_ylabel()``.
             Any matplotlib ``Text`` properties
 
         Notes
@@ -632,8 +632,3 @@ class XGrid(Grid):
                     row[0].yaxis.set_label_position('left')
                     row[0].set_ylabel(yl, fontsize=fontsize, labelpad=labelpad,
                                       **kwargs)
-
-    # def set_xlabels(self, xlabels, rows='all', fontsize=12, labelpad=12,
-    #                 rotation=0, **kwargs):
-    #     """
-    #     """
