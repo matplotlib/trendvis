@@ -7,11 +7,10 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
               axis_shift=None, twinax_shift=None, tick_fontsize=10, **kwargs):
 
     """
-    Easy grid and grid formatting set-up; not all options accessible
-        via this interface.
+    Build a plot with a stack of multiple y (x) axes against a main x (y) axis
 
-    Create a plot with a stack of multiple y (x) axes against
-        the main axis, x (y).
+    This is an easy grid and grid formatting set-up, but not all options are
+    accessible via this interface.
 
     Parameters
     ----------
@@ -59,7 +58,7 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
 
     Other Parameters
     ----------------
-    kwargs : passed to plot_data(), then to axes.plot()
+    kwargs : passed to ``plot_data()``, then to ``axes.plot()``
 
     Returns
     -------
@@ -69,8 +68,8 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
 
     mainax = main_axis.lower()[0]
 
-    startside_dict = {'x' : 'left',
-                      'y' : 'top'}
+    startside_dict = {'x': 'left',
+                      'y': 'top'}
 
     startside = startside_dict[mainax]
 
@@ -119,7 +118,7 @@ def plot_data(grid, plotdata, auto_spinecolor=True, marker='o', ls='-',
               zorder=10, lw=1, **kwargs):
     """
     Easy way to plot a lot of line data at once.  Other plotting calls
-        can be made by accessing individual axes in grid.axes
+    can be made by accessing individual axes in ``grid.axes``.
 
     Parameters
     ----------

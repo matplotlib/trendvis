@@ -5,14 +5,14 @@ import matplotlib.pyplot as plt
 
 class Grid(object):
     """
-    Superlass for ``YGrid``, ``XGrid``.
+    Superclass for ``YGrid`` and ``XGrid``.
 
     """
 
     def __init__(self, xratios, yratios, mainax_x):
         """
         Initialize grid attributes.  Should only be called through
-            ``XGrid``, ``YGrid`` subclasses.
+        ``XGrid`` or ``YGrid`` subclasses.
 
         Parameters
         ----------
@@ -128,7 +128,7 @@ class Grid(object):
     def set_dataside(self, startside, alternate_sides):
         """
         Set the dataside_list that indicates which stacked ax spine will be
-            the data spine.
+        the data spine.
 
         Parameters
         ----------
@@ -155,8 +155,7 @@ class Grid(object):
 
     def set_stackposition(self, onespine_forboth):
         """
-        Set ``self.stackpos_list`` that indicates where the row or col is
-            in the grid
+        Set ``self.stackpos_list`` indicating which non-stacked axes are shown.
 
         Parameters
         ----------
@@ -184,7 +183,7 @@ class Grid(object):
 
     def set_relative_axshift(self, axis_shift=None, twin_shift=None):
         """
-        Set universal or individual stacked axis spine relative shift
+        Set relative shift of stacked axis spines.
 
         Parameters
         -----------------
@@ -228,7 +227,7 @@ class Grid(object):
     def set_absolute_axshift(self):
         """
         Translate ``self.relative_shifts`` to absolute values based on the
-            corresponding plot side the axis will appear on
+        corresponding plot side where the axis appears.
 
         """
 
@@ -306,14 +305,14 @@ class Grid(object):
 
     def reset_spineshift(self):
         """
-        Reset all spines to normal position
+        Reset all spines to normal position.
 
         """
 
-        shifts = {'x' : {'left'   : 0.0,
-                         'right'  : 1.0},
-                  'y' : {'bottom' : 0.0,
-                         'top'    : 1.0}}
+        shifts = {'x': {'left'   : 0.0,
+                        'right'  : 1.0},
+                  'y': {'bottom' : 0.0,
+                        'top'    : 1.0}}
 
         sd = shifts[self.mainax_id]
 
@@ -329,7 +328,7 @@ class Grid(object):
 
     def replace_spines(self):
         """
-        Undo the spine-hiding actions of ``self.cleanup_grid()``
+        Undo the spine-hiding actions of ``self.cleanup_grid()``.
 
         """
 
@@ -343,7 +342,7 @@ class Grid(object):
     def set_ax_visibility(self, ax, which, visible):
         """
         Hide (``visible``=False) or show (``visible``=True) an axis side
-            (``which``).  Will hide/show spine, ticks, and ticklabels.
+        (``which``).  Will hide/show spine, ticks, and ticklabels.
 
         Parameters
         ----------
@@ -433,8 +432,8 @@ class Grid(object):
 
     def set_spinewidth(self, spinewidth):
         """
-        Edit the linewidth of the axis spines.  ``self.spinewidth`` used as
-            default linewidths in drawing frames and cutouts.
+        Edit the linewidth of the axis spines. ``self.spinewidth`` used as
+        default linewidths in drawing frames and cutouts.
 
         Parameters
         ----------
@@ -526,7 +525,7 @@ class Grid(object):
     def autocolor_spines(self, which):
         """
         Set the axis stacked ax spine and tick color based on the indicated
-            plot color (accessed via ``ax.children[2: some number]``)
+        plot color (accessed via ``ax.children[2: some number]``)
 
         Parameters
         ----------
@@ -564,7 +563,7 @@ class Grid(object):
 
     def reset_spinecolor(self):
         """
-        Change all spine colors back to black
+        Reset all spine colors to black.
 
         """
 
@@ -576,10 +575,10 @@ class Grid(object):
                    facecolor='none', **kwargs):
         """
         Draw frame around each column (``XGrid``) or row (``YGrid`) of plot.
-            E.g., if ``self.mainax_dim`` == 1, then a frame will be drawn
-            around the whole figure, visually anhoring axes; if
-            ``self.mainax_dim`` > 1, then each mainax section will have
-            a frame drawn around it.
+
+        E.g., if ``self.mainax_dim`` == 1, then a frame will be drawn around
+        the whole figure, visually anchoring axes; if ``self.mainax_dim`` > 1,
+        then each mainax section will have a frame drawn around it.
 
         Parameters
         ----------
@@ -634,11 +633,11 @@ class Grid(object):
                  zorder=-1, **kwargs):
         """
         Draws vertical or horizontal bars across the ENTIRE plot space,
-            anchoring them on opposite axes.
+        anchoring them on opposite axes.
 
         If horizontal (vertical) bars are drawn on ``XGrid`` (``YGrid``), then
-            adjusting plot spacing afterwards will appear to displace bar,
-            because they are drawn on the figure and not the axes.
+        adjusting plot spacing afterwards will appear to displace bar, because
+        they are drawn on the figure and not the axes.
 
         Parameters
         ----------
@@ -681,7 +680,7 @@ class Grid(object):
     def _update_twinsides(self):
         """
         Update the sides that twinned axes appear on in the event of a
-            change to ``self.dataside_list``.
+        change to ``self.dataside_list``.
 
         """
 
@@ -701,7 +700,7 @@ class Grid(object):
 
     def _pop_data_ax(self, subgrid, side):
         """
-        Pop out data axis from row or column
+        Pop out data axis from row or column.
 
         Parameters
         ----------
@@ -719,7 +718,7 @@ class Grid(object):
 
     def _replace_data_ax(self, subgrid, data_ind, data_ax):
         """
-        Put data axis back in its original place in row or column
+        Put data axis back in its original place in row or column.
 
         Parameters
         ----------
@@ -760,7 +759,7 @@ class Grid(object):
         Returns
         -------
         itemlist : list
-            List of some comination of ``choice1``, ``choice2``
+            List of some comination of ``choice1`` and ``choice2``.
 
         """
 
@@ -782,7 +781,7 @@ class Grid(object):
                    tick_dim, labelsize, pad, direction):
         """
         Set the x and/or y axis major and/or minor ticks at the given
-            subgrid_inds, ax_inds locations.
+        ``subgrid_inds``, ``ax_inds`` locations.
 
         Parameters
         ----------
@@ -817,7 +816,7 @@ class Grid(object):
 
     def _convert_coords(self, axis, coordinates):
         """
-        Convert data coordinates to axis and figure coordinates
+        Convert data coordinates to axis and figure coordinates.
 
         Parameters
         ----------

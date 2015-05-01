@@ -6,8 +6,7 @@ from gridclass import Grid
 
 class XGrid(Grid):
     """
-    Class for making a plot with the x axis as the main axis
-        and a stack of y axes
+    Construct a plot with the x axis as the main axis and a stack of y axes.
 
     """
 
@@ -184,7 +183,7 @@ class XGrid(Grid):
         Get axis at a particular x, y location.
 
         If a twin is desired, then there are two options:
-            1.  Set `ypos` to actual storage position in `self.axes`
+            1.  Set `ypos` to actual storage position in ``self.axes``
             2.  Set `ypos` to the physical position in XGrid, set is_twin=True,
                 and if there is more than one twin at that location, set
                 `twinstance` to indicate desired twin (e.g. 0 indicates the
@@ -231,11 +230,11 @@ class XGrid(Grid):
 
     def get_twin_rownum(self, ypos, twinstance=None):
         """
-        Original axes are easily located by row number in `self.axes`.
-            If there are multiple twins, finding those in `self.axes` may be
+        Original axes are easily located by row number in ``self.axes``.
+            If there are multiple twins, finding those in ``self.axes`` may be
             difficult, esp. if twins were created haphazardly.
 
-        This returns the index required by `self.axes` to fetch the
+        This returns the index required by ``self.axes`` to fetch the
             twin row.
 
         Parameters
@@ -267,8 +266,8 @@ class XGrid(Grid):
                          logyscale='none'):
         """
         Set the y and x axis scales, the y and x axis ticks (if linear), and
-            the tick number format.  Wrapper around Grid.set_yaxis_ticknum(),
-            Grid.set_xaxis_ticknum().
+        the tick number format.  Wrapper around Grid.set_yaxis_ticknum(),
+        Grid.set_xaxis_ticknum().
 
         Parameters
         ----------
@@ -367,7 +366,7 @@ class XGrid(Grid):
         reverse_y : string or list of ints
             Default 'all'.  'all' or list of indices of the y axes to be
             reversed accepted.  If unsure of index for a twin y axis in
-            `self.axes`, find using self.get_twin_rownum()
+            ``self.axes``, find using self.get_twin_rownum()
 
         """
 
@@ -387,7 +386,7 @@ class XGrid(Grid):
         reverse_x : string or list of ints
             Default 'all'.  'all' or list of indices of the x axes to be
             reversed accepted.  If unsure of index for a twin y axis in
-            `self.axes`, find using self.get_twin_rownum()
+            ``self.axes``, find using self.get_twin_rownum()
 
         """
 
@@ -407,7 +406,7 @@ class XGrid(Grid):
         ylim : list of tuples of ints and/or floats
             List of (row, min, max).  If ydim is 1, then row is ignored.
             Also, if only one y axis needs ylim, can just pass the tuple.
-            If unsure of row index for a twin y axis in `self.axes`,
+            If unsure of row index for a twin y axis in ``self.axes``,
             find using self.get_twin_rownum()
 
         """
@@ -481,7 +480,7 @@ class XGrid(Grid):
         row : string or list of ints
             Default 'all'.  The rows containing the axes that need tick
             parameters adjusted, 'all' or list of indices.  If unsure of row
-            index for a twin y axis in `self.axes`, find using
+            index for a twin y axis in ``self.axes``, find using
             self.get_twin_rownum()
         column: string or list of ints
             Default 'all'.  The columns containing the axes that need tick
@@ -632,8 +631,3 @@ class XGrid(Grid):
                     row[0].yaxis.set_label_position('left')
                     row[0].set_ylabel(yl, fontsize=fontsize, labelpad=labelpad,
                                       **kwargs)
-
-    # def set_xlabels(self, xlabels, rows='all', fontsize=12, labelpad=12,
-    #                 rotation=0, **kwargs):
-    #     """
-    #     """
