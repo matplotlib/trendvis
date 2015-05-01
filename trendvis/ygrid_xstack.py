@@ -6,7 +6,7 @@ from gridclass import Grid
 
 class YGrid(Grid):
     """
-    Construct a plot with the Y axis as the main axis and a stack of x axes.
+    Construct a plot with the y axis as the main axis and a stack of x axes.
 
     """
 
@@ -537,7 +537,7 @@ class YGrid(Grid):
         lw : int
             Default 'default'.  If default, lw = self.spinewidth.
         **kwargs
-            Passed to ``axis.plot()``.  Any valid kwargs.
+            Passed to ``axes.plot()``.  Any valid kwargs.
 
         Notes
         -----
@@ -618,7 +618,7 @@ class YGrid(Grid):
             Default 12.  The spacing between the tick labels adn the axis
             labels.
         **kwargs
-            Passed to ``axis.set_xlabel()``.
+            Passed to ``axes.set_xlabel()``.
             Any matplotlib ``Text`` properties
 
         Notes

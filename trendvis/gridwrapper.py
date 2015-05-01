@@ -58,7 +58,7 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
 
     Other Parameters
     ----------------
-    kwargs : passed to ``plot_data()``, then to ``axis.plot()``
+    kwargs : passed to ``plot_data()``, then to ``axes.plot()``
 
     Returns
     -------

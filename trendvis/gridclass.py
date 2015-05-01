@@ -155,7 +155,7 @@ class Grid(object):
 
     def set_stackposition(self, onespine_forboth):
         """
-        Set ``self.stackpos_list`` indicating the [row, col] grid position.
+        Set ``self.stackpos_list`` indicating which non-stacked axes are shown.
 
         Parameters
         ----------
@@ -577,7 +577,7 @@ class Grid(object):
         Draw frame around each column (``XGrid``) or row (``YGrid`) of plot.
 
         E.g., if ``self.mainax_dim`` == 1, then a frame will be drawn around
-        the whole figure, visually anhoring axes; if ``self.mainax_dim`` > 1,
+        the whole figure, visually anchoring axes; if ``self.mainax_dim`` > 1,
         then each mainax section will have a frame drawn around it.
 
         Parameters
