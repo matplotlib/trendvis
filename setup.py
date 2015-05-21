@@ -8,7 +8,7 @@ multiple vertically or horizontally offset scatter or line plots with a
 common x or y axis, respectively, in what is visually one compact
 plotting area, facilitating comparisons among various datasets.
 TrendVis also contains advanced  "broken x" and "broken y" versions of
-these plots, as well as point color/shape/size-based trend visualizations.
+these plots.
 
 """
 

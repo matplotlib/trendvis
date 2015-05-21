@@ -16,9 +16,9 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
     ----------
     xratios : int or list of ints
         The relative sizes of the columns.  Not directly comparable
-        to yratios
+        to ``yratios``
     yratios : int or list of ints
-        The relative sizes of the rows.  Not directly comparable to xratios
+        The relative sizes of the rows.  Not directly comparable to ``xratios``
     figsize : tuple of ints or floats
         The figure dimensions in inches
     xticks : list of tuples
@@ -33,25 +33,26 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
     Keyword Arguments
     -----------------
     plotdata : list of lists of tuples
-        Default None. Tuple format: (x, y, color, {}, [ax inds within row/col])
+        Default ``None``.
+        Tuple format: (x, y, color, {}, [ax inds within row/col])
         One sublist per row or column (including twins).  To skip plotting on a
         row or column, insert empty sublist at position corresponding to
         the index of the row or column.
     xlim : list of tuples of ints and/or floats
-        Default None.  List of (column, min, max).
+        Default ``None``.  List of (column, min, max).
         If xdim is 1, then column is ignored.
-        Also, if only one x axis needs xlim, can just pass the tuple
+        Also, if only one x axis needs ``xlim``, can just pass the tuple
     ylim : List of tuples of ints and/or flaots
-        Default None.  List of (row, min, max).
+        Default ``None``.  List of (row, min, max).
         If ydim is 1, then row is ignored.
-        Also, if only one y axis needs ylim, can just pass a tuple.
+        Also, if only one y axis needs ``ylim``, can just pass a tuple.
     to_twin : list of ints
-        Default None.  The indices of the rows (columns) to twin
+        Default ``None``.  The indices of the rows (columns) to twin
     axis_shift : float or list of floats
-        Default None.  Universal (float) or individual (list of floats)
+        Default ``None``.  Universal (float) or individual (list of floats)
         original axis spine relative shift.  Units are fraction of figure
     twinax_shift : float or list of floats
-        Default None.  Universal (float) or individual (list of floats)
+        Default ``None``.  Universal (float) or individual (list of floats)
         twinned axis spine relative shift.  Units are fraction of figure
     tick_fontsize : int
         Default 10.  The fontsize of tick labels.
@@ -62,7 +63,7 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
 
     Returns
     -------
-    grid : YGrid or XGrid instance
+    grid : ``YGrid`` or ``XGrid`` instance
 
     """
 
@@ -122,10 +123,11 @@ def plot_data(grid, plotdata, auto_spinecolor=True, marker='o', ls='-',
 
     Parameters
     ----------
-    grid : XGrid or YGrid instance
+    grid : ``XGrid`` or ``YGrid`` instance
         The Grid of axes on which to plot.
     plotdata : list of lists of tuples
-        Default None. Tuple format: (x, y, color, {}, [ax inds within row/col])
+        Default ``None``.
+        Tuple format: (x, y, color, {}, [ax inds within row/col])
         One sublist per row or column (including twins).  To skip plotting on a
         row or column, insert empty sublist at position corresponding to
         the index of the row or column.
@@ -133,12 +135,12 @@ def plot_data(grid, plotdata, auto_spinecolor=True, marker='o', ls='-',
     Keyword Arguments
     -----------------
     auto_spinecolor : Boolean
-        If True, will color each stacked axis spines and ticks with the color
-        of the first plot on the axis.
+        If ``True``, will color each stacked axis spines and ticks with
+        the color of the first plot on the axis.
     marker : string
-        Default 'o'.  Any matplotlib marker.
+        Default 'o'.  Any ``matplotlib`` marker.
     ls : string
-        Default '-'. Any matplotlib linestyle.
+        Default '-'. Any ``matplotlib`` linestyle.
     zorder : int
         Default 10.  The zorder of the plot.
     lw : string
@@ -146,7 +148,7 @@ def plot_data(grid, plotdata, auto_spinecolor=True, marker='o', ls='-',
 
     Other Parameters
     ----------------
-    kwargs : passed to axes.plot()
+    kwargs : passed to ``axes.plot()``
 
     """
 

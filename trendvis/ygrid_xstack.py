@@ -20,22 +20,22 @@ class YGrid(Grid):
         ----------
         xstack_ratios : int or list of ints
             The relative sizes of the columns.  Not directly comparable
-            to yratios
+            to ``yratios``
         yratios : int or list of ints
             Default 1.  The relative sizes of the main axis row(s).
-            Not directly comparable to xstack_ratios
+            Not directly comparable to ``xstack_ratios``
         figsize : tuple of ints or floats
             Default (10, 10).  The figure dimensions in inches
         startside : string
             Default 'top'.  ['top'|'bottom'].  The side the leftmost x axis
             will be on.
         alternate_sides : Boolean
-            Default True.  [True|False].
-            Stacked axis spines alternate sides or are all on startside.
+            Default ``True``.  [True|False].
+            Stacked axis spines alternate sides or are all on ``startside``.
         onespine_forboth : Boolean
-            Default False.  [True|False].  If the plot stack is only 1 column,
-            then both main axis spines can be visible (False),
-            or only the left spine is visible (True).
+            Default ``False``.  [True|False].  If the plot stack is only 1
+            column, then both main axis spines can be visible (``False``),
+            or only the left spine is visible (``True``).
 
         """
 
@@ -132,6 +132,7 @@ class YGrid(Grid):
         Parameters
         ----------
         wspace : float
+            Spacing between columns
 
         """
 
@@ -184,10 +185,11 @@ class YGrid(Grid):
 
         If a twin is desired, then there are two options:
           1.  Set ``xpos`` to actual storage position in ``self.axes``
-          2.  Set ``xpos`` to the physical position in YGrid, set is_twin=True,
-              and if there is more than one twin at that location, set
-              ``twinstance`` to indicate desired twin (e.g. 0 indicates the
-              first twin to be created in that column position).
+              Can find twin ``xpos`` via ``self.get_twin_colnum()``
+          2.  Set ``xpos`` to the physical position in ``YGrid``, set
+              ``is_twin``=``True``, and if there is more than one twin at that
+              location, set ``twinstance`` to indicate desired twin (e.g.
+              0 indicates the first twin to be created in that col position).
 
         For original axes, storage position and physical position are the same,
         except if twins exist and negative ``xpos`` indices are used.
@@ -199,16 +201,18 @@ class YGrid(Grid):
         ypos : int
             Default 0.  The row the axis is in.
         is_twin : Boolean
-            Default False. If is_twin, ``self.get_axis()`` will grab the twin
-            at the given xpos, ypos rather than the original axis.
+            Default ``False``. If ``is_twin``, ``self.get_axis()`` will grab
+            the twin at the given ``xpos``, ``ypos`` rather than the
+            original axis.
         twinstance : int
-            Default 0.  If there is more than one twin at xpos, ypos, then
-            this will indicate which twin to grab.
+            Default 0.  If there is more than one twin at ``xpos``, ``ypos``,
+            then this will indicate which twin to grab.
 
         Returns
         -------
-        ax : Axes instance
-            matplotlib axes instance at the given xpos, ypos, (twinstance)
+        ax : ``Axes`` instance
+            ``matplotlib Axes`` instance at the given ``xpos``, ``ypos``,
+            (``twinstance``)
 
         """
 
@@ -230,21 +234,20 @@ class YGrid(Grid):
 
     def get_twin_colnum(self, xpos, twinstance=None):
         """
-        The index required by ``self.axes`` to fetch the desired twin column.
+        Original axes are easily located by column number in ``self.axes``.
+        If there are are multiple twins, finding those in ``self.axes``
+        may be difficult, esp. if twins were created haphazardly
+
+        This prints the index required by ``self.axes`` to fetch the
+        twin column.
 
         Parameters
         ----------
         xpos : int
             The column that was twinned
         twinstance : int
-            Default None, print all twin column indices at `xpos`.  Indicates
-            which twin column index to print
-
-        Notes
-        -----
-        Original axes are easily located by column number in ``self.axes``.
-        If there are multiple twins, finding those in ``self.axes`` may be
-        difficult, esp. if twins were created haphazardly.
+            Default ``None``, print all twin column indices at ``xpos``.
+            Indicates which twin column index to print
 
         """
 
@@ -267,29 +270,27 @@ class YGrid(Grid):
                          logyscale='none'):
         """
         Set the y and x axis scales, the y and x axis ticks (if linear), and
-        the tick number format.
+        the tick number format.  Wrapper around ``Grid.set_yaxis_ticknum()``,
+        ``Grid.set_xaxis_ticknum()``.
 
         Parameters
         ----------
         xticks : list of tuples
             List of (major, minor) tick mark multiples.  Used to set major and
             minor locators.  One tuple per x axis (original stack + twins).
-            Use None to skip setting a major, minor MultipleLocator for an axis
+            Use ``None`` to skip setting a major, minor ``MultipleLocator``
+            for an axis
         yticks : list of tuples
             List of (major, minor) tick mark multiples.  Used to set major and
             minor locators.  One tuple per main axis.
-            Use None to skip setting a major, minor MultipleLocator for an axis
+            Use ``None`` to skip setting a major, minor ``MultipleLocator``
+            for an axis
         logxscale : string or list of ints
             Default 'none'.  ['none'|'all'|list of x-axis indices].
             Indicate which x axes should be log scaled instead of linear.
         logyscale : string or list of ints
             Default 'none'.  ['none'|'all'|list of y-axis indices].
             Indicate which y axes should be log scaled instead of linear.
-
-        Notes
-        -----
-        Wrapper around ``Grid.set_yaxis_ticknum()`` and
-        ``Grid.set_xaxis_ticknum()``.
 
         """
 
@@ -321,16 +322,16 @@ class YGrid(Grid):
         ax : string or axes instance
             Default 'all', cycle through axes and set formatters.
             If axes instance, will only set x and/or y formatter of that axes
-            instance.  Can acquire axis using self.get_axis()
+            instance.  Can acquire axis using ``self.get_axis()``
         xformatter : string or list of strings
             Default '%d'.  String formatting magic to apply to all x axes
             (string) or individual x axes (list of strings,
-            length = self.total_stackdim).  Can use None to skip setting
-            x formatter, or insert None into list to skip setting x formatter
-            for a particular axis column
+            length = ``self.total_stackdim``).  Can use ``None`` to skip
+            setting ``xformatter``, or insert ``None`` into list to skip
+            setting ``xformatter`` for a particular axis column
         yformatter : string
             Default '%d'.  String formatting magic to apply to all y axes.
-            Can use None to skip setting y formatter
+            Can use ``None`` to skip setting ``yformatter``
 
         """
 
@@ -410,7 +411,7 @@ class YGrid(Grid):
         ----------
         xlim : list of tuples of ints and/or floats
             List of (column, min, max).  If xdim is 1, then column is ignored.
-            Also, if only one x axis needs xlim, can just pass the tuple
+            Also, if only one x axis needs ``xlim``, can just pass the tuple.
             If unsure of column index for a twin x axis in ``self.axes``,
             find using ``self.get_twin_colnum()``
 
@@ -446,7 +447,7 @@ class YGrid(Grid):
         ----------
         ylim : List of tuples of ints and/or flaots
             List of (row, min, max).  If ydim is 1, then row is ignored.
-            Also, if only one y axis needs ylim, can just pass a tuple.
+            Also, if only one y axis need ``ylim``, can just pass a tuple.
 
         """
 
@@ -478,6 +479,8 @@ class YGrid(Grid):
         """
         Set x and/or y axis ticks for all or specified axes.
 
+        Does not set axis color
+
         Parameters
         ----------
         row : string or list of ints
@@ -486,8 +489,8 @@ class YGrid(Grid):
         column: string or list of ints
             Default 'all'.  The columns containing the axes that need tick
             parameters adjusted, 'all' or list of indices.  If unsure of column
-            index for a twin x axis in `self.axes`, find using
-            self.get_twin_colnum()
+            index for a twin x axis in ``self.axes``, find using
+            ``self.get_twin_colnum()``
         xy_axis : string
             Default 'both'.  ['x'|'y'|'both']
         which : string
@@ -506,10 +509,6 @@ class YGrid(Grid):
         minor_tickdir : string
             Default 'out'.  ['out'|'in'|'inout'].  The minor tick direction.
 
-        Notes
-        -----
-        Does not set axis color.
-
         """
 
         if row is 'all':
@@ -527,7 +526,9 @@ class YGrid(Grid):
 
     def draw_cutout(self, di=0.025, lw='default', **kwargs):
         """
-        Draw cut marks on broken y axes.
+        Draw cut marks to signifiy broken y axes.
+
+        Only drawn when ``self.mainax_dim`` > 1.
 
         Parameters
         ----------
@@ -535,13 +536,9 @@ class YGrid(Grid):
             Default 0.025.  The dimensions of the cutout mark as a
             fraction of the smallest axis length.
         lw : int
-            Default 'default'.  If default, lw = self.spinewidth.
+            Default 'default'.  If 'default', ``lw = self.spinewidth``.
         **kwargs
-            Passed to ``axes.plot()``.  Any valid kwargs.
-
-        Notes
-        -----
-        Only drawn when ``self.mainax_dim`` > 1.
+            Passed to ``axes.plot()``.  Any valid ``kwargs``.
 
         """
 
@@ -605,27 +602,25 @@ class YGrid(Grid):
 
     def set_xlabels(self, xlabels, fontsize=14, labelpad=12, **kwargs):
         """
-        Tool for setting all x labels at once.
+        Tool for setting all x axis labels at once. Can skip labelling an axis
+        by providing a ``None`` in corresponding poiition in list.
 
         Parameters
         ----------
         xlabels : list of strings
-            The list of xlabels, one per x-axis.  Insert ``None`` in list to
+            The list of labels, one per x-axis.  Insert ``None`` in list to
             skip an axis.
         fontsize : int
-            Default 14.  The xlabel fontsize.
+            Default 14.  The fontsize of ``xlabels``
         labelpad : int
             Default 12.  The spacing between the tick labels adn the axis
             labels.
         **kwargs
             Passed to ``axes.set_xlabel()``.
-            Any matplotlib ``Text`` properties
+            Any ``matplotlib Text`` properties
 
         Notes
         -----
-        Can skip labelling an axis by providing a ``None`` in corresponding
-        poisition in list.
-
         Caution- this will set twin axis labels in the order that twins were
         created, which may not correspond to physical position in grid.
 

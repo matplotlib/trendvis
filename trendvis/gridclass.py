@@ -127,8 +127,8 @@ class Grid(object):
 
     def set_dataside(self, startside, alternate_sides):
         """
-        Set the dataside_list that indicates which stacked ax spine will be
-        the data spine.
+        Set the ``dataside_list`` that indicates which stacked ax spine will be
+        the visible data spine.
 
         Parameters
         ----------
@@ -161,7 +161,7 @@ class Grid(object):
         ----------
         onespine_forboth : Boolean
             [True|False].  If the plot stack is only 1 row (column), then
-            both main axis spines may be used (False), or only the bottom
+            both main axis spines may be visible (False), or only the bottom
             (left) spine.
 
         """
@@ -226,8 +226,8 @@ class Grid(object):
 
     def set_absolute_axshift(self):
         """
-        Translate ``self.relative_shifts`` to absolute values based on the
-        corresponding plot side where the axis appears.
+        Translate ``self.relative_shifts`` to absolute values.  Absolute values
+        are based on which side the axis to be moved appears.
 
         """
 
@@ -278,7 +278,7 @@ class Grid(object):
 
     def move_one_spine(self, ax, which, shift):
         """
-        Move ``which`` stacked ``ax`` spine by ``shift``.
+        Move ``which`` stacked ``ax`` spine by relative ``shift``.
 
         Parameters
         ----------
@@ -326,7 +326,7 @@ class Grid(object):
         self.reltwin_shifts = None
         self.twin_shifts = None
 
-    def replace_spines(self):
+    def reveal_spines(self):
         """
         Undo the spine-hiding actions of ``self.cleanup_grid()``.
 
@@ -341,8 +341,8 @@ class Grid(object):
 
     def set_ax_visibility(self, ax, which, visible):
         """
-        Hide (``visible``=False) or show (``visible``=True) an axis side
-        (``which``).  Will hide/show spine, ticks, and ticklabels.
+        Hide (``visible``=``False``) or show (``visible``=``True``) an axis
+        side (``which``).  Will hide/show spine, ticks, and ticklabels.
 
         Parameters
         ----------
@@ -451,7 +451,7 @@ class Grid(object):
 
     def remove_twins(self):
         """
-        Get rid of twinned axes.
+        Get rid of all twinned axes.
 
         """
 
@@ -475,8 +475,8 @@ class Grid(object):
 
         Parameters
         ----------
-        axis : Axes instance
-            Axes instance to set x-axis scale and potentially
+        axis : ``matplotlib Axes`` instance
+            ``Axes`` instance to set x-axis scale and potentially
             major and minor tick locators.  Can get with ``self.get_axis()``
         xticks : tuple
             Tuple of (major, minor) x axis tick multiples.
@@ -502,8 +502,8 @@ class Grid(object):
 
         Parameters
         ----------
-        axis : matplotlib Axes instance
-            Axes instance to set y-axis scale and potentially
+        axis : ``matplotlib Axes`` instance
+            ``Axes`` instance to set y-axis scale and potentially
             major and minor tick locators.  Can get with ``self.get_axis()``
         xticks : tuple
             Tuple of (major, minor) y axis tick multiples.
@@ -530,7 +530,7 @@ class Grid(object):
         Parameters
         ----------
         which : int
-            Index of the line in each Axes instances' list of lines that
+            Index of the line in each ``Axes`` instances' list of lines that
             should be used to set the color.  Commonly 0 (stacked axes are same
             color as first data plotted on axes instance)
 
@@ -550,10 +550,10 @@ class Grid(object):
 
         Parameters
         ----------
-        ax : matplotlib axes instance
+        ax : ``matplotlib Axes`` instance
             Can get with ``self.get_axis()``
         color : string, tuple of floats
-            Any color accepted by matplotlib.
+            Any color accepted by ``matplotlib``.
 
         """
 
@@ -588,9 +588,9 @@ class Grid(object):
         zorder : int
             Default -1.  The zorder of the frame.
         edgecolor : string or tuple of floats
-            Default 'black'.  Any matplotlib-accepted color.
+            Default 'black'.  Any ``matplotlib``-accepted color.
         facecolor : string or tuple of floats
-            Default 'none'.  The background color.  Any matplotlib-accepted
+            Default 'none'.  The background color.  Any ``matplotlib``-accepted
             color.
         **kwargs
             Passed to ``plt.Rectangle``; any valid
@@ -641,9 +641,9 @@ class Grid(object):
 
         Parameters
         ----------
-        ll_axis : matplotlib Axes instance
+        ll_axis : ``matplotlib Axes`` instance
             The axis that will contain the lower left corner of the bar
-        ur_axis : matplotlib Axes instance
+        ur_axis : ``matplotlib Axes`` instance
             The axis that will contain the upper right corner of the bar
         bar_limits : length 2 tuple of ints or floats,
             The lower, upper data limits of the bar
@@ -704,8 +704,8 @@ class Grid(object):
 
         Parameters
         ----------
-        subgrid : list of axes instances
-            Row or column of axes
+        subgrid : list of ``Axes`` instances
+            Row or column of ``Axes``
         side : string
             The side that the visible stacked spine is on.
 
@@ -726,8 +726,8 @@ class Grid(object):
             Row or column of axes
         data_ind : int
             [0|-1].  The side that the visible stacked spine is on.
-        data_ax : axes instance
-            The axes instance from ``subgrid`` that has the
+        data_ax : ``matplotlib Axes`` instance
+            The ``Axes`` instance from ``subgrid`` that has the
             visible stacked spine.
 
         """
@@ -739,7 +739,7 @@ class Grid(object):
 
     def _make_lists(self, dim, item, choice1, choice2):
         """
-        Make a list choice1 and/or choice2 of length dim.
+        Make a list of ``choice1`` and/or ``choice2`` of length dim.
 
         Parameters
         ----------
@@ -759,7 +759,7 @@ class Grid(object):
         Returns
         -------
         itemlist : list
-            List of some comination of ``choice1`` and ``choice2``.
+            List of some combination of ``choice1`` and ``choice2``.
 
         """
 
@@ -786,8 +786,8 @@ class Grid(object):
         Parameters
         ----------
         subgrid_inds : list of ints
-            The indices of the rows (XGrid) or columns (YGrid) containing
-            the axes that need tick parameters adjusted
+            The indices of the rows (``XGrid``) or columns (``YGrid``)
+            containing the axes that need tick parameters adjusted
         ax_inds : list of ints
             The indices of the axes within the indicated subgrids that need
             tick parameters adjusted
@@ -796,7 +796,7 @@ class Grid(object):
         which : string
             The set of ticks to adjust.  ['major'|'minor']
         tick_dim : tuple of ints or floats
-            The (length, width) of `which` ticks.
+            The (length, width) of ``which`` ticks.
         labelsize : int
             Tick label fontsize in points.
         pad : int
@@ -816,12 +816,12 @@ class Grid(object):
 
     def _convert_coords(self, axis, coordinates):
         """
-        Convert data coordinates to axis and figure coordinates.
+        Convert data ``coordinates`` to axis and figure coordinates.
 
         Parameters
         ----------
-        axis : matplotlib Axes instance
-            The axes instance used to convert data coordinates into axes
+        axis : ``matplotlib Axes`` instance
+            The axes instance used to convert data ``coordinates`` into axes
             and figure coordinates
         coordinates : tuple of floats
             Coordinates in the data coordinate system
