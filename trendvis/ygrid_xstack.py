@@ -94,6 +94,7 @@ class YGrid(Grid):
             Indices of the column or columns to twin
 
         """
+
         try:
             new_twin_dim = len(cols_to_twin)
         except TypeError:
@@ -130,7 +131,7 @@ class YGrid(Grid):
 
         self.grid_isclean = False
 
-    def adjust_spacing(self, wspace):
+    def adjust_spacing(self, wspace, adjust_bar_frame=True):
         """
         Adjust the horizontal spacing between columns.
 
@@ -138,10 +139,16 @@ class YGrid(Grid):
         ----------
         wspace : float
             Spacing between columns
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
         plt.subplots_adjust(wspace=wspace)
+
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
 
     def cleanup_grid(self):
         """
@@ -368,7 +375,7 @@ class YGrid(Grid):
                     for ax in col:
                         ax.yaxis.set_major_formatter(yfrmttr)
 
-    def reverse_yaxis(self, reverse_y='all'):
+    def reverse_yaxis(self, reverse_y='all', adjust_bar_frame=True):
         """
         Reverse any or all y axes.
 
@@ -378,6 +385,9 @@ class YGrid(Grid):
             Default 'all'.  'all' or list of indices of the y axes to be
             reversed accepted.  If unsure of index for a twin x axis in
             ``self.axes``, find using ``self.get_twin_colnum()``.
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
@@ -388,7 +398,10 @@ class YGrid(Grid):
         for r in reverse_y:
             self.axes[0][r].invert_yaxis()
 
-    def reverse_xaxis(self, reverse_x='all'):
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
+
+    def reverse_xaxis(self, reverse_x='all', adjust_bar_frame=True):
         """
         Reverse any or all x axes.
 
@@ -398,6 +411,9 @@ class YGrid(Grid):
             Default 'all'.  'all' or list of indices of the x axes to be
             reversed accepted.  If unsure of index for a twin x axis in
             ``self.axes``, find using ``self.get_twin_colnum()``.
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
@@ -408,7 +424,10 @@ class YGrid(Grid):
         for r in reverse_x:
             self.axes[r][0].invert_xaxis()
 
-    def set_xlim(self, xlim):
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
+
+    def set_xlim(self, xlim, adjust_bar_frame=True):
         """
         Set x limits.
 
@@ -419,6 +438,9 @@ class YGrid(Grid):
             Also, if only one x axis needs ``xlim``, can just pass the tuple.
             If unsure of column index for a twin x axis in ``self.axes``,
             find using ``self.get_twin_colnum()``
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
@@ -444,7 +466,10 @@ class YGrid(Grid):
                 for ax in self.axes[xl[0]]:
                     ax.set_xlim(xl[1], xl[2])
 
-    def set_ylim(self, ylim):
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
+
+    def set_ylim(self, ylim, adjust_bar_frame=True):
         """
         Set y limits.
 
@@ -453,6 +478,9 @@ class YGrid(Grid):
         ylim : List of tuples of ints and/or flaots
             List of (row, min, max).  If ydim is 1, then row is ignored.
             Also, if only one y axis need ``ylim``, can just pass a tuple.
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
@@ -477,6 +505,9 @@ class YGrid(Grid):
             for yl in ylim:
                 for col in self.axes:
                     col[yl].set_ylim(ylim[1], ylim[2])
+
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
 
     def set_ticks(self, row='all', column='all', xy_axis='both', which='both',
                   major_dim=(6, 2), minor_dim=(4, 1), labelsize=10, pad=10,

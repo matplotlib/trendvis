@@ -36,6 +36,12 @@ class Grid(object):
 
         self.axes = []
 
+        self.bf_urcorners = []
+        self.bf_llcorners = []
+        self.bf_patchinds = []
+        self.bf_uraxis = []
+        self.bf_llaxis = []
+
         self.relative_shifts = None
         self.stack_shifts = None
 
@@ -572,7 +578,7 @@ class Grid(object):
                 self.set_axcolor(ax, 'black')
 
     def draw_frame(self, lw='default', zorder=-1, edgecolor='black',
-                   facecolor='none', **kwargs):
+                   facecolor='none', make_adjustable=True, **kwargs):
         """
         Draw frame around each column (``XGrid``) or row (``YGrid`) of plot.
 
@@ -592,6 +598,10 @@ class Grid(object):
         facecolor : string or tuple of floats
             Default 'none'.  The background color.  Any ``matplotlib``-accepted
             color.
+        make_adjustable : Boolean
+            Default True.  Keep the original frame data.  This will allow the
+            frame to be moved back into place if axis limits and/or
+            subplot spacings are changed after drawing.
         **kwargs
             Passed to ``plt.Rectangle``; any valid
             ``matplotlib.patches.Patch`` kwargs
@@ -618,10 +628,16 @@ class Grid(object):
             urdx = ur_axis.get_xlim()[1]
             urdy = ur_axis.get_ylim()[1]
 
+            if make_adjustable:
+                self.bf_llcorners.append((lldx, lldy))
+                self.bf_urcorners.append((urdx, urdy))
+                self.bf_llaxis.append(ll_axis)
+                self.bf_uraxis.append(ur_axis)
+
             ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
             ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
 
-            width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
+            width, height = self._rect_dim(ur_corner, ll_corner)
 
             patchlist.append(plt.Rectangle(ll_corner, width, height,
                                            zorder=zorder, facecolor=facecolor,
@@ -629,8 +645,11 @@ class Grid(object):
                                            transform=self.fig.transFigure,
                                            **kwargs))
 
+            if make_adjustable:
+                self.bf_patchinds.append(len(patchlist) - 1)
+
     def draw_bar(self, ll_axis, ur_axis, bar_limits, orientation='vertical',
-                 zorder=-1, **kwargs):
+                 zorder=-1, make_adjustable=True, **kwargs):
         """
         Draws vertical or horizontal bars across the ENTIRE plot space,
         anchoring them on opposite axes.
@@ -652,6 +671,10 @@ class Grid(object):
             axis of the bar
         zorder : int
             Default -1.  Zorder of the bar.
+        make_adjustable : Boolean
+            Default True.  Keep the original bar data.  This will allow the
+            bar to be moved back into place if axis limits and/or
+            subplot spacings are changed after drawing.
         **kwargs
             Passed to ``plt.Rectangle``; any valid
             ``matplotlib.patches.Patch`` kwargs
@@ -667,15 +690,57 @@ class Grid(object):
             lldx = ll_axis.get_xlim()[0]
             urdx = ur_axis.get_xlim()[1]
 
-        ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
+        if make_adjustable:
+            self.bf_llcorners.append((lldx, lldy))
+            self.bf_urcorners.append((urdx, urdy))
+            self.bf_llaxis.append(ll_axis)
+            self.bf_uraxis.append(ur_axis)
+
+        ll_corner  = self._convert_coords(ll_axis, (lldx, lldy))
         ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
 
-        width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
+        width, height = self._rect_dim(ur_corner, ll_corner)
 
         self.fig.patches.append(plt.Rectangle(ll_corner, width, height,
                                               zorder=zorder,
                                               transform=self.fig.transFigure,
                                               **kwargs))
+
+        if make_adjustable:
+            self.bf_patchinds.append(len(self.fig.patches) - 1)
+
+    def adjust_bar_frame(self):
+        """
+        Bars and frames made via ``self.draw_frame()`` and ``self.draw_bar()``
+        are drawn on figure coordinates, so these patches and the axes
+        move relative to each other when axis limits or subplot spacings are
+        changed.
+
+        This function realigns existing bars and frames with the original data
+        coordinates.
+
+        """
+        # Check that there are any items to adjust
+        if len(self.bf_llcorners) > 0:
+            for ll, ur, llax, urax, ind in zip(self.bf_llcorners,
+                                               self.bf_urcorners,
+                                               self.bf_llaxis,
+                                               self.bf_uraxis,
+                                               self.bf_patchinds):
+                # Grab rectangle
+                rect = self.fig.patches[ind]
+
+                # Get new figure coordinates
+                new_x, new_y = self._convert_coords(llax, ll)
+                ur_corner = self._convert_coords(urax, ur)
+
+                # Get new figure dimensions
+                width, height = self._rect_dim(ur_corner, (new_x, new_y))
+
+                rect.set_x = new_x
+                rect.set_y = new_y
+                rect.set_width = width
+                rect.set_height = height
 
     def _update_twinsides(self):
         """
@@ -816,7 +881,7 @@ class Grid(object):
 
     def _convert_coords(self, axis, coordinates):
         """
-        Convert data ``coordinates`` to axis and figure coordinates.
+        Convert data ``coordinates`` to axis coordinates.
 
         Parameters
         ----------
@@ -840,6 +905,16 @@ class Grid(object):
         fig_coords = self.fig.transFigure.inverted().transform(ax_coords)
 
         return fig_coords
+
+    def _rect_dim(self, ur_corner, ll_corner):
+        """
+        Find w, h dimensions of rectange drawn in figure coordinates.
+
+        """
+
+        width, height = (ur - ll for ur, ll in zip(ur_corner, ll_corner))
+
+        return width, height
 
     def _ratios_arelists(self, ratios):
         """

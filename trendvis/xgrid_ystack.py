@@ -131,7 +131,7 @@ class XGrid(Grid):
 
         self.grid_isclean = False
 
-    def adjust_spacing(self, hspace):
+    def adjust_spacing(self, hspace, adjust_bar_frame=True):
         """
         Adjust the vertical spacing between rows.
 
@@ -139,10 +139,16 @@ class XGrid(Grid):
         ----------
         hspace : float
             Spacing between rows
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
         self.fig.subplots_adjust(hspace=hspace)
+
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
 
     def cleanup_grid(self):
         """
@@ -369,7 +375,7 @@ class XGrid(Grid):
                     for ax in row:
                         ax.xaxis.set_major_formatter(xfrmttr)
 
-    def reverse_yaxis(self, reverse_y='all'):
+    def reverse_yaxis(self, reverse_y='all', adjust_bar_frame=True):
         """
         Reverse all or any y axis.
 
@@ -379,6 +385,9 @@ class XGrid(Grid):
             Default 'all'.  'all' or list of indices of the y axes to be
             reversed accepted.  If unsure of index for a twin y axis in
             ``self.axes``, find using ``self.get_twin_rownum()``
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
@@ -389,7 +398,10 @@ class XGrid(Grid):
         for r in reverse_y:
             self.axes[r][0].invert_yaxis()
 
-    def reverse_xaxis(self, reverse_x='all'):
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
+
+    def reverse_xaxis(self, reverse_x='all', adjust_bar_frame=True):
         """
         Reverse all or any x axis.
 
@@ -399,6 +411,9 @@ class XGrid(Grid):
             Default 'all'.  'all' or list of indices of the x axes to be
             reversed accepted.  If unsure of index for a twin y axis in
             ``self.axes``, find using ``self.get_twin_rownum()``
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
@@ -409,7 +424,10 @@ class XGrid(Grid):
         for r in reverse_x:
             self.axes[0][r].invert_xaxis()
 
-    def set_ylim(self, ylim):
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
+
+    def set_ylim(self, ylim, adjust_bar_frame=True):
         """
         Set y limits.
 
@@ -420,6 +438,9 @@ class XGrid(Grid):
             Also, if only one y axis needs ``ylim``, can just pass the tuple.
             If unsure of row index for a twin y axis in ``self.axes``,
             find using ``self.get_twin_rownum()``
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
@@ -445,7 +466,10 @@ class XGrid(Grid):
                 for ax in self.axes[yl[0]]:
                     ax.set_ylim(yl[1], yl[2])
 
-    def set_xlim(self, xlim):
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
+
+    def set_xlim(self, xlim, adjust_bar_frame=True):
         """
         Set x limits.
 
@@ -454,6 +478,9 @@ class XGrid(Grid):
         xlim : List of tuples of ints and/or flaots
             List of (column, min, max).  If xdim is 1, then column is ignored.
             Also, if only one x axis needs ``xlim``, can just pass a tuple.
+        adjust_bar_frame : Boolean
+            Default True.  Realign ``matplotlib Rectangle patches``
+            made via ``self.draw_bar`` and ``self.draw_frame``.
 
         """
 
@@ -478,6 +505,9 @@ class XGrid(Grid):
             for xl in xlim:
                 for row in self.axes:
                     row[xl[0]].set_xlim(xl[1], xl[2])
+
+        if adjust_bar_frame:
+            self.adjust_bar_frame()
 
     def set_ticks(self, row='all', column='all', xy_axis='both', which='both',
                   major_dim=(6, 2), minor_dim=(4, 1), labelsize=10, pad=10,
