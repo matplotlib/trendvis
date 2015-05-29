@@ -90,17 +90,22 @@ class YGrid(Grid):
 
         Parameters
         ----------
-        cols_to_twin : list of ints
-            Indices of the columns to twin
+        cols_to_twin : int or list of ints
+            Indices of the column or columns to twin
 
         """
+        try:
+            new_twin_dim = len(cols_to_twin)
+        except TypeError:
+            new_twin_dim = 1
+            cols_to_twin = [cols_to_twin]
 
         if self.twinds is None:
             self.twinds = cols_to_twin
-            self.twin_dim = len(cols_to_twin)
+            self.twin_dim = new_twin_dim
         else:
             self.twinds.extend(cols_to_twin)
-            self.twin_dim += len(cols_to_twin)
+            self.twin_dim += new_twin_dim
 
         self._update_total_stackdim()
 

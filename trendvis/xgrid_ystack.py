@@ -94,13 +94,18 @@ class XGrid(Grid):
             Indices of the rows to twin
 
         """
+        try:
+            new_twin_dim = len(rows_to_twin)
+        except TypeError:
+            new_twin_dim = 1
+            rows_to_twin = [rows_to_twin]
 
         if self.twinds is None:
             self.twinds = rows_to_twin
-            self.twin_dim = len(rows_to_twin)
+            self.twin_dim = new_twin_dim
         else:
             self.twinds.extend(rows_to_twin)
-            self.twin_dim += len(rows_to_twin)
+            self.twin_dim += new_twin_dim
 
         self._update_total_stackdim()
 
