@@ -90,10 +90,11 @@ class XGrid(Grid):
 
         Parameters
         ----------
-        rows_to_twin : list of ints
-            Indices of the rows to twin
+        rows_to_twin : int or list of ints
+            Indices of the row or rows to twin
 
         """
+
         try:
             new_twin_dim = len(rows_to_twin)
         except TypeError:
