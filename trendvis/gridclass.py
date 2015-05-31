@@ -213,7 +213,7 @@ class Grid(object):
                 self.relative_shifts = [axis_shift] * self.stackdim
             else:
                 if len(axis_shift) != self.stackdim:
-                    print 'Warning:  len(axis_shift) != ' + self.stackdim
+                    print 'Warning:  len(axis_shift) != ' + str(self.stackdim)
                     self.relative_shifts = [axis_shift[0]] * self.stackdim
                 else:
                     self.relative_shifts = axis_shift
