@@ -528,7 +528,7 @@ class Grid(object):
         else:
             axis.set_yscale(scale)
 
-    def autocolor_spines(self, which):
+    def autocolor_spines(self, which, ticks_only=False):
         """
         Set the axis stacked ax spine and tick color based on the indicated
         plot color (accessed via ``ax.children[2: some number]``)
@@ -539,6 +539,9 @@ class Grid(object):
             Index of the line in each ``Axes`` instances' list of lines that
             should be used to set the color.  Commonly 0 (stacked axes are same
             color as first data plotted on axes instance)
+        ticks_only : Boolean
+            Default ``False``.  If ``True``, then the tick color will change
+            and the axis color will not.  If ``False``, both will change.
 
         """
 
@@ -548,9 +551,9 @@ class Grid(object):
                     color = ax.get_children()[2 + which].get_color()
                 except AttributeError:
                     color = ax.get_children()[2 + which].get_facecolor()
-                self.set_axcolor(ax, color)
+                self.set_axcolor(ax, color, ticks_only=ticks_only)
 
-    def set_axcolor(self, ax, color):
+    def set_axcolor(self, ax, color, ticks_only=False):
         """
         Set the stacked ax spine and tick color of the given Axes.
 
@@ -560,12 +563,17 @@ class Grid(object):
             Can get with ``self.get_axis()``
         color : string, tuple of floats
             Any color accepted by ``matplotlib``.
+        ticks_only : Boolean
+            Default ``False``.  If ``True``, then the tick color will change
+            and the axis color will not.  If ``False``, both will change.
 
         """
 
         ax.tick_params(axis=self.stackax_id, color=color, which='both')
-        ax.spines[self.sp1].set_color(color)
-        ax.spines[self.sp2].set_color(color)
+
+        if not ticks_only:
+            ax.spines[self.sp1].set_color(color)
+            ax.spines[self.sp2].set_color(color)
 
     def reset_spinecolor(self):
         """
