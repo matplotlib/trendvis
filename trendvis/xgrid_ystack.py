@@ -12,7 +12,7 @@ class XGrid(Grid):
 
     def __init__(self, ystack_ratios, xratios=1, figsize=(10, 10),
                  startside='left', alternate_sides=True,
-                 onespine_forboth=False):
+                 onespine_forboth=False, **kwargs):
         """
         Initialize X_Grid
 
@@ -36,18 +36,19 @@ class XGrid(Grid):
             Default ``False``.  [True|False].  If the plot stack is only 1 row,
             then both main axis spines can be visible (``False``),
             or only the bottom spine (``True``).
+        **kwargs
+            Any plt.figure arguments.  Passed to Grid.__init__(),
+            plt.figure()
 
         """
 
         # Initialize parent class
         # Last arg is True because mainax_x
-        Grid.__init__(self, xratios, ystack_ratios, True)
+        Grid.__init__(self, xratios, ystack_ratios, True, figsize, **kwargs)
 
         # Set initial x and y grid positions (top left)
         xpos = 0
         ypos = 0
-
-        self.fig = plt.figure(figsize=figsize)
 
         # Create axes row by row
         for rowspan in self.yratios:

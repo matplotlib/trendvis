@@ -9,7 +9,7 @@ class Grid(object):
 
     """
 
-    def __init__(self, xratios, yratios, mainax_x):
+    def __init__(self, xratios, yratios, mainax_x, figsize, **kwargs):
         """
         Initialize grid attributes.  Should only be called through
         ``XGrid`` or ``YGrid`` subclasses.
@@ -25,8 +25,13 @@ class Grid(object):
         mainax_x : Boolean
             [True|False].  Indicates if x is the main axis.  Determines
             some attributes
+        figsize : tuple of ints or floats
+            Default (10, 10).  The figure dimensions in inches
+        **kwargs
+            Any plt.figure arguments
 
         """
+        self.fig = plt.figure(figsize=figsize)
 
         self.gridrows, self.yratios = self._ratios_arelists(yratios)
         self.gridcols, self.xratios = self._ratios_arelists(xratios)
@@ -187,6 +192,27 @@ class Grid(object):
             self.stackpos_list = ([self.startpos] + ['none'] * num_nones +
                                   [alt_pos[self.startpos]])
 
+    def move_spines(self, axis_shift=None, twin_shift=None):
+        """
+        Wrapper around self.set_relative_axshift(),
+        self.set_absolute_axshift(), self.excecute_spineshift()
+
+        Parameters
+        -----------------
+        axis_shift : float or list of floats
+            Default None.  Set universal (float) or individual (list of
+            floats where len(``axis_shift``) = ``self.stackdim``)
+            axis spine shift
+        twin_shift : float or list of floats
+            Default None.  Set universal (float) or individual (list of
+            floats where len(``twin_shift``) = ``self.twin_dim``)
+            twinned axis spine shift.
+        """
+
+        self.set_relative_axshift(axis_shift=axis_shift, twin_shift=twin_shift)
+        self.set_absolute_axshift()
+        self.excecute_spineshift()
+
     def set_relative_axshift(self, axis_shift=None, twin_shift=None):
         """
         Set relative shift of stacked axis spines.
@@ -260,7 +286,7 @@ class Grid(object):
                 else:
                     self.twin_shifts.append(1 + shift)
 
-    def move_spines(self):
+    def excecute_spineshift(self):
         """
         Move the stacked spines around.
 
