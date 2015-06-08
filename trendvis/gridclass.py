@@ -579,7 +579,7 @@ class Grid(object):
                     color = ax.get_children()[2 + which].get_facecolor()
                 self.set_axcolor(ax, color, ticks_only=ticks_only)
 
-    def set_axcolor(self, ax, color, ticks_only=False):
+    def set_axcolor(self, ax, color, ticks_only=False, spines_only=False):
         """
         Set the stacked ax spine and tick color of the given Axes.
 
@@ -595,13 +595,14 @@ class Grid(object):
 
         """
 
-        ax.tick_params(axis=self.stackax_id, color=color, which='both')
+        if not spines_only:
+            ax.tick_params(axis=self.stackax_id, color=color, which='both')
 
         if not ticks_only:
             ax.spines[self.sp1].set_color(color)
             ax.spines[self.sp2].set_color(color)
 
-    def reset_spinecolor(self):
+    def reset_spinecolor(self, spines_only=False):
         """
         Reset all spine colors to black.
 
@@ -609,7 +610,7 @@ class Grid(object):
 
         for subgrid in self.axes:
             for ax in subgrid:
-                self.set_axcolor(ax, 'black')
+                self.set_axcolor(ax, 'black', spines_only=spines_only)
 
     def draw_frame(self, lw='default', zorder=-1, edgecolor='black',
                    facecolor='none', make_adjustable=True, **kwargs):
