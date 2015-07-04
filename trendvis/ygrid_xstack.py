@@ -126,7 +126,7 @@ class YGrid(Grid):
 
             # Make the x axes shared
             if len(twin_col) > 1:
-                twin_col.get_shared_x_axes().join(*twin_col)
+                twin_col[0].get_shared_x_axes().join(*twin_col)
 
             self.axes.append(twin_col)
 
