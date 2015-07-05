@@ -127,7 +127,7 @@ def plot_data(grid, plotdata, auto_spinecolor=True, marker='o', ls='-',
         The Grid of axes on which to plot.
     plotdata : list of lists of tuples
         Default ``None``.
-        Tuple format: (x, y, color, {}, [ax inds within row/col])
+        Tuple format: (x, y, color, [ax inds within row/col])
         One sublist per row or column (including twins).  To skip plotting on a
         row or column, insert empty sublist at position corresponding to
         the index of the row or column.
@@ -156,7 +156,7 @@ def plot_data(grid, plotdata, auto_spinecolor=True, marker='o', ls='-',
         for ax_ind in range(0, grid.mainax_dim):
             for dataset in subgrid_data:
                 try:
-                    if ax_ind in dataset[4]:
+                    if ax_ind in dataset[3]:
                         subgrid[ax_ind].plot(dataset[0], dataset[1], lw=lw,
                                              color=dataset[2], marker=marker,
                                              ls=ls, zorder=zorder, **kwargs)

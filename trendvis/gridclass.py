@@ -554,17 +554,13 @@ class Grid(object):
         else:
             axis.set_yscale(scale)
 
-    def autocolor_spines(self, which, ticks_only=False):
+    def autocolor_spines(self, ticks_only=False):
         """
-        Set the axis stacked ax spine and tick color based on the indicated
-        plot color (accessed via ``ax.children[2: some number]``)
+        Set the axis stacked ax spine and tick color based on the color of the
+        first trace on the axis (accessed via ``ax.children[2]``)
 
         Parameters
         ----------
-        which : int
-            Index of the line in each ``Axes`` instances' list of lines that
-            should be used to set the color.  Commonly 0 (stacked axes are same
-            color as first data plotted on axes instance)
         ticks_only : Boolean
             Default ``False``.  If ``True``, then the tick color will change
             and the axis color will not.  If ``False``, both will change.
@@ -574,9 +570,9 @@ class Grid(object):
         for subgrid in self.axes:
             for ax in subgrid:
                 try:
-                    color = ax.get_children()[2 + which].get_color()
+                    color = ax.get_children()[2].get_color()
                 except AttributeError:
-                    color = ax.get_children()[2 + which].get_facecolor()
+                    color = ax.get_children()[2].get_facecolor()
                 self.set_axcolor(ax, color, ticks_only=ticks_only)
 
     def set_axcolor(self, ax, color, ticks_only=False, spines_only=False):
