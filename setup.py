@@ -4,11 +4,9 @@ descr = """TrendVis (a.k.a. `trendvis`): Complex plotting in matplotlib.
 
 This package is designed to programmatically create complex, publication-
 quality figures using matplotlib.  TrendVis' speciality is creating
-multiple vertically or horizontally offset scatter or line plots with a
+multiple vertically or horizontally offset plots with a
 common x or y axis, respectively, in what is visually one compact
 plotting area, facilitating comparisons among various datasets.
-TrendVis also contains advanced  "broken x" and "broken y" versions of
-these plots.
 
 """
 
