@@ -82,6 +82,9 @@ class XGrid(Grid):
             xpos = 0
             ypos += rowspan
 
+        for ax in self.axes[0]:
+            ax.xaxis.set_label_position('top')
+
         self.set_dataside(startside, alternate_sides)
         self.set_stackposition(onespine_forboth)
 
