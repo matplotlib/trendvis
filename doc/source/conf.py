@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# cycler documentation build configuration file, created by
+# trendvis documentation build configuration file, created by
 # sphinx-quickstart on Wed Jul  1 13:32:53 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -63,8 +63,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'cycler'
-copyright = '2015, Matplotlib Developers'
+project = 'trendvis'
+copyright = '2015, Mellissa Cross'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -196,7 +196,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'cyclerdoc'
+htmlhelp_basename = 'trendvisdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -216,8 +216,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'cycler.tex', 'cycler Documentation',
-   'Matplotlib Developers', 'manual'),
+  ('index', 'trendvis.tex', 'trendvis Documentation',
+   'Mellissa Cross', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -246,8 +246,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'cycler', 'cycler Documentation',
-     ['Matplotlib Developers'], 1)
+    ('index', 'trendvis', 'trendvis Documentation',
+     ['Mellissa Cross'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -260,8 +260,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'cycler', 'cycler Documentation',
-   'Matplotlib Developers', 'cycler', 'One line description of project.',
+  ('index', 'trendvis', 'trendvis Documentation',
+   'Mellissa Cross', 'trendvis', 'One line description of project.',
    'Miscellaneous'),
 ]
 
