@@ -1,7 +1,7 @@
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
-from gridclass import Grid
+from .gridclass import Grid
 
 
 class XGrid(Grid):
@@ -273,11 +273,11 @@ class XGrid(Grid):
         else:
             newypos = [self.stackdim + twindices[twinstance]]
 
-        print ('The twin(s) of row ' + str(ypos) + ' are stored in ' +
-               '`self.axes` as row(s):')
+        print('The twin(s) of row ' + str(ypos) + ' are stored in ' +
+              '`self.axes` as row(s):')
 
         for ny in newypos:
-            print ny
+            print(ny)
 
     def set_all_ticknums(self, xticks, yticks, logxscale='none',
                          logyscale='none'):

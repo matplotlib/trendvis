@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
 
@@ -239,7 +239,7 @@ class Grid(object):
                 self.relative_shifts = [axis_shift] * self.stackdim
             else:
                 if len(axis_shift) != self.stackdim:
-                    print 'Warning:  len(axis_shift) != ' + str(self.stackdim)
+                    print('Warning:  len(axis_shift) != ' + str(self.stackdim))
                     self.relative_shifts = [axis_shift[0]] * self.stackdim
                 else:
                     self.relative_shifts = axis_shift
@@ -251,7 +251,7 @@ class Grid(object):
                 self.reltwin_shifts = [twin_shift] * self.twin_dim
             else:
                 if len(twin_shift) != self.twin_dim:
-                    print 'Warning:  len(twin_shift) != number of twinned ax!'
+                    print('Warning:  len(twin_shift) != number of twinned ax!')
                     self.reltwin_shifts = [twin_shift[0]] * self.twin_dim
                 else:
                     self.reltwin_shifts = twin_shift

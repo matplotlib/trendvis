@@ -12,11 +12,13 @@ matrix:
     - python : "nightly"
 
 install:
+  - pip install nose coveralls matplotlib flake8
   - python setup.py install
-  - pip install coveralls six
 
 script:
   - python run_tests.py
+
+  - flake8 --exit-zero trendvis
 
 after_success:
   coveralls

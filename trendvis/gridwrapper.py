@@ -1,5 +1,6 @@
-from xgrid_ystack import XGrid
-from ygrid_xstack import YGrid
+from __future__ import division, print_function, absolute_import
+from .xgrid_ystack import XGrid
+from .ygrid_xstack import YGrid
 
 
 def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
