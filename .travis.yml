@@ -11,6 +11,10 @@ matrix:
   allow_failures:
     - python : "nightly"
 
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
 install:
   - pip install nose coveralls matplotlib flake8
   - python setup.py install
