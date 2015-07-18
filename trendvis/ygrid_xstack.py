@@ -82,6 +82,9 @@ class YGrid(Grid):
             ypos = 0
             xpos += colspan
 
+        for ax in self.axes[-1]:
+            ax.yaxis.set_label_position('right')
+
         self.set_dataside(startside, alternate_sides)
         self.set_stackposition(onespine_forboth)
 
