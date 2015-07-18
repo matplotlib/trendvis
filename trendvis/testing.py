@@ -9,7 +9,6 @@ def _assert_same_figure_images(fig, name, test_file, tol=17):
     import shutil
     from matplotlib import cbook
     from matplotlib.testing.compare import compare_images
-    from nose.tools import assert_is_not_none
 
     if not ".png" in name:
         name = name+".png"
