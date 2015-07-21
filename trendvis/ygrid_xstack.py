@@ -508,7 +508,7 @@ class YGrid(Grid):
 
             for yl in ylim:
                 for col in self.axes:
-                    col[yl].set_ylim(ylim[1], ylim[2])
+                    col[yl[0]].set_ylim(yl[1], yl[2])
 
         if adjust_bar_frame:
             self.adjust_bar_frame()
