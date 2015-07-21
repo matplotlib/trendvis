@@ -573,6 +573,8 @@ class Grid(object):
                     color = ax.get_children()[2].get_color()
                 except AttributeError:
                     color = ax.get_children()[2].get_facecolor()
+                    if len(color) < 3:
+                      color = color[0]
                 self.set_axcolor(ax, color, ticks_only=ticks_only)
 
     def set_axcolor(self, ax, color, ticks_only=False, spines_only=False):
@@ -720,6 +722,7 @@ class Grid(object):
         ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
 
         width, height = self._rect_dim(ur_corner, ll_corner)
+        print (ll_corner, width, height)
 
         self.fig.patches.append(plt.Rectangle(ll_corner, width, height,
                                               zorder=zorder,
@@ -756,10 +759,7 @@ class Grid(object):
                 # Get new figure dimensions
                 width, height = self._rect_dim(ur_corner, (new_x, new_y))
 
-                rect.set_x = new_x
-                rect.set_y = new_y
-                rect.set_width = width
-                rect.set_height = height
+                rect.set_bounds(new_x, new_y, width, height)
 
     def _update_twinsides(self):
         """
