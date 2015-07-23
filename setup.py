@@ -19,8 +19,7 @@ LICENSE             = 'Modified BSD'
 DOWNLOAD_URL        = ''
 VERSION             = '0.2.1'
 PYTHON_VERSION      = (2, 6)
-DEPENDENCIES        = {'numpy': (1, 6),
-                       'matplotlib': (1, 2)}
+DEPENDENCIES        = {'matplotlib': (1, 2)}
 
 
 import os
@@ -137,9 +136,3 @@ if __name__ == '__main__':
         include_package_data=True,
         zip_safe=False
     )
-
-# Not included as this package has no post-install scripts or build req:
-      # entry_points={
-      #     'console_scripts': ['skivi = skimage.scripts.skivi:main'],
-      # },
-      # cmdclass={'build_py': build_py},
