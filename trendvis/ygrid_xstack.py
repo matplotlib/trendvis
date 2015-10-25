@@ -149,7 +149,7 @@ class YGrid(Grid):
 
         """
 
-        plt.subplots_adjust(wspace=wspace)
+        self.fig.subplots_adjust(wspace=wspace)
 
         if adjust_bar_frame:
             self.adjust_bar_frame()
