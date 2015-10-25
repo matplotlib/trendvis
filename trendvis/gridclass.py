@@ -724,7 +724,6 @@ class Grid(object):
         ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
 
         width, height = self._rect_dim(ur_corner, ll_corner)
-        print (ll_corner, width, height)
 
         self.fig.patches.append(plt.Rectangle(ll_corner, width, height,
                                               zorder=zorder,
