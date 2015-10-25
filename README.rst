@@ -12,6 +12,8 @@ well-suited for time-series data. The results speak for themselves:
     :target: https://raw.githubusercontent.com/mscross/scipy_proceedings/trendvis/papers/mellissa_cross_t/barredplot.png
     :alt: TrendVis example
 
+For further reading on TrendVis, see the `SciPy 2015 Proceedings <http://conference.scipy.org/proceedings/scipy2015/mellissa_cross_t.html>`_.
+
 ============
 Installation
 ============
@@ -222,3 +224,12 @@ Three-column ``XGrid`` with advanced features
 .. image:: https://cloud.githubusercontent.com/assets/2184487/8860699/097e51fa-314b-11e5-93e5-eb158aa5b801.png
     :target: https://cloud.githubusercontent.com/assets/2184487/8860699/097e51fa-314b-11e5-93e5-eb158aa5b801.png
     :alt: Three-column XGrid with advanced features
+
+===========================
+Examples in Published Works
+===========================
+*Great Basin hydrology, paleoclimate, and connections with the North Atlantic: A speleothem stable isotope and trace element record from Lehman Caves, NV* by Mellissa Cross, David McGee, Wallace S. Broecker, Jay Quade, Jeremy D. Shakun, Hai Cheng, Yanbin Lu, and R. Lawrence Edwards.  doi:`10.1016/j.quascirev.2015.06.016 <http://dx.doi.org/10.1016/j.quascirev.2015.06.016>`_
+    Figures 2, 3, 4, 5, and panels 1 and 2 in figure 6 made with TrendVis.
+    
+Additional references to works containing TrendVis figures are welcome!
+    
