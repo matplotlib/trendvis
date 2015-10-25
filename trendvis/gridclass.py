@@ -89,10 +89,10 @@ class Grid(object):
                                            'right': ['top', 'bottom', 'left'],
                                            'none' : ['top', 'bottom', 'left',
                                                      'right']},
-                                 'bottom' : {'left' : ['top', 'right'],
-                                             'right': ['top', 'left'],
-                                             'none' : ['top', 'left',
-                                                       'right']},
+                                 'bottom': {'left' : ['top', 'right'],
+                                            'right': ['top', 'left'],
+                                            'none' : ['top', 'left',
+                                                      'right']},
                                  'both' : {'left' : ['right'],
                                            'right': ['left'],
                                            'none' : ['right', 'left']}}
@@ -126,10 +126,10 @@ class Grid(object):
                                            'bottom': ['top', 'left', 'right'],
                                            'none'  : ['top', 'bottom', 'left',
                                                       'right']},
-                                 'right' : {'top'   : ['bottom', 'left'],
-                                            'bottom': ['top', 'left'],
-                                            'none'  : ['top', 'bottom',
-                                                       'left']},
+                                 'right': {'top'   : ['bottom', 'left'],
+                                           'bottom': ['top', 'left'],
+                                           'none'  : ['top', 'bottom',
+                                                      'left']},
                                  'both' : {'top'   : ['bottom'],
                                            'bottom': ['top'],
                                            'none'  : ['top', 'bottom']}}
@@ -183,6 +183,8 @@ class Grid(object):
         # Position list in the case of a stack of 1
         if self.stackdim == 1:
             if onespine_forboth:
+                if self.mainax_id is 'x':
+                    self.startpos = 'bottom'
                 self.stackpos_list = [self.startpos]
             else:
                 self.stackpos_list = ['both']
@@ -574,7 +576,7 @@ class Grid(object):
                 except AttributeError:
                     color = ax.get_children()[2].get_facecolor()
                     if len(color) < 3:
-                      color = color[0]
+                        color = color[0]
                 self.set_axcolor(ax, color, ticks_only=ticks_only)
 
     def set_axcolor(self, ax, color, ticks_only=False, spines_only=False):
@@ -718,7 +720,7 @@ class Grid(object):
         self.bf_llaxis.append(ll_axis)
         self.bf_uraxis.append(ur_axis)
 
-        ll_corner  = self._convert_coords(ll_axis, (lldx, lldy))
+        ll_corner = self._convert_coords(ll_axis, (lldx, lldy))
         ur_corner = self._convert_coords(ur_axis, (urdx, urdy))
 
         width, height = self._rect_dim(ur_corner, ll_corner)
