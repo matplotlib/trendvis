@@ -641,7 +641,7 @@ class XGrid(Grid):
             kwargs.update(transform=low_ax.transAxes)
             low_ax.plot(left, lower_y, **kwargs)
 
-    def set_ylabels(self, ylabels, fontsize=14, labelpad=12, **kwargs):
+    def set_ylabels(self, ylabels, fontsize=None, labelpad=12, **kwargs):
         """
         Tool for setting all y axis labels at once.  Can skip labelling an axis
         by providing a ``None`` in corresponding position in list.
@@ -652,7 +652,7 @@ class XGrid(Grid):
             The list of labels, one per y-axis.  Insert ``None`` in list to
             skip an axis.
         fontsize : int
-            Default 14.  The font size of ``ylabels``
+            Default None. The font size of ``ylabels``
         labelpad : int
             Default 12.  The spacing between the tick labels and the axis
             labels.
