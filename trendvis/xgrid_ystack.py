@@ -10,7 +10,7 @@ class XGrid(Grid):
 
     """
 
-    def __init__(self, ystack_ratios, xratios=1, figsize=(10, 10),
+    def __init__(self, ystack_ratios, xratios=1, figsize=None,
                  startside='left', alternate_sides=True,
                  onespine_forboth=False, **kwargs):
         """
@@ -25,7 +25,8 @@ class XGrid(Grid):
             Default 1. The relative sizes of the main axis column(s).
             Not directly comparable to ``ystack_ratios``
         figsize : tuple of ints or floats
-            Default (10,10).  The figure dimensions in inches
+            Default None. The figure dimensions in inches.
+            If not provided, defaults to matplotlib rc figure.figsize.
         startside : string
             Default 'left'.  ['left'|'right'].  The side the topmost y axis
             will be on.

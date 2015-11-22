@@ -26,11 +26,13 @@ class Grid(object):
             [True|False].  Indicates if x is the main axis.  Determines
             some attributes
         figsize : tuple of ints or floats
-            Default (10, 10).  The figure dimensions in inches
+            The figure dimensions in inches. If None, defaults to matplotlib
+            rc figure.figsize.
         **kwargs
             Any plt.figure arguments
 
         """
+        figsize = figsize or plt.rcParams['figure.figsize']
         self.fig = plt.figure(figsize=figsize)
 
         self.gridrows, self.yratios = self._ratios_arelists(yratios)
