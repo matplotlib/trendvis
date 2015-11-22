@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 from matplotlib.testing.noseclasses import KnownFailure
 from nose.tools import assert_equal, assert_raises, assert_false, assert_true
 
+# baseline images use the old default figsize of 10x10 inches.
+plt.rcParams['figure.figsize'] = '10, 10'
+
 
 @cleanup
 def test_xgrid_init():
