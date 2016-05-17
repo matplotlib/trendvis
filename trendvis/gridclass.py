@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
-import matplotlib.lines
+import matplotlib.lines as lines
 
 
 class Grid(object):
