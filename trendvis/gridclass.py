@@ -1,6 +1,7 @@
 from __future__ import division, print_function, absolute_import
 from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
+import matplotlib.lines
 
 
 class Grid(object):
@@ -558,8 +559,11 @@ class Grid(object):
 
     def autocolor_spines(self, ticks_only=False):
         """
-        Set the axis stacked ax spine and tick color based on the color of the
-        first trace on the axis (accessed via ``ax.children[2]``)
+        Set the axis stacked ax spine and/or tick color based on the color of
+        the first line on the axis.
+
+        If no line is found on an axis, then ``autocolor_spines()`` will
+        default to the color of the first item in the list of axis children.
 
         Parameters
         ----------
@@ -571,13 +575,25 @@ class Grid(object):
 
         for subgrid in self.axes:
             for ax in subgrid:
+                # Default is first child, unless the first line is found
+                # later among the children. Should account for difference
+                # among recent versions of matplotlib
+                child = ax.get_children()[0]
+                for kid in ax.get_children():
+                    if isinstance(kid, lines.Line2D):
+                        child = kid
+                        break
                 try:
-                    color = ax.get_children()[2].get_color()
+                    color = child.get_color()
                 except AttributeError:
-                    color = ax.get_children()[2].get_facecolor()
+                    color = child.get_facecolor()
                     if len(color) < 3:
                         color = color[0]
-                self.set_axcolor(ax, color, ticks_only=ticks_only)
+
+                try:
+                    self.set_axcolor(ax, color, ticks_only=ticks_only)
+                except:
+                    pass
 
     def set_axcolor(self, ax, color, ticks_only=False, spines_only=False):
         """
