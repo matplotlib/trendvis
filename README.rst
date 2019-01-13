@@ -228,7 +228,7 @@ Three-column ``XGrid`` with advanced features
 ===========================
 Examples in Published Works
 ===========================
-*Great Basin hydrology, paleoclimate, and connections with the North Atlantic: A speleothem stable isotope and trace element record from Lehman Caves, NV* by Mellissa Cross, David McGee, Wallace S. Broecker, Jay Quade, Jeremy D. Shakun, Hai Cheng, Yanbin Lu, and R. Lawrence Edwards.  doi:`10.1016/j.quascirev.2015.06.016 <http://dx.doi.org/10.1016/j.quascirev.2015.06.016>`_
+*Great Basin hydrology, paleoclimate, and connections with the North Atlantic: A speleothem stable isotope and trace element record from Lehman Caves, NV* by Mellissa Cross, David McGee, Wallace S. Broecker, Jay Quade, Jeremy D. Shakun, Hai Cheng, Yanbin Lu, and R. Lawrence Edwards.  doi:`10.1016/j.quascirev.2015.06.016 <https://doi.org/10.1016/j.quascirev.2015.06.016>`_
     Figures 2, 3, 4, 5, and panels 1 and 2 in figure 6 made with TrendVis.
     
 Additional references to works containing TrendVis figures are welcome!
