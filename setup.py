@@ -80,24 +80,6 @@ version='%s'
         vfile.close()
 
 
-def configuration(parent_package='', top_path=None):
-    if os.path.exists('MANIFEST'):
-        os.remove('MANIFEST')
-
-    from numpy.distutils.misc_util import Configuration
-    config = Configuration(None, parent_package, top_path)
-
-    config.set_options(ignore_setup_xxx_py=True,
-                       assume_default_configuration=True,
-                       delegate_options_to_subpackages=True,
-                       quiet=True)
-
-    config.add_subpackage('trendvis')
-    # config.add_data_dir('trendvis/data')
-
-    return config
-
-
 if __name__ == '__main__':
     check_requirements()
     write_version_py()
@@ -126,7 +108,6 @@ if __name__ == '__main__':
             'Operating System :: Unix',
             'Operating System :: MacOS'],
 
-        configuration=configuration,
 
         packages=setuptools.find_packages(),
         include_package_data=True,
