@@ -1,5 +1,12 @@
 #! /usr/bin/env python
 
+import os
+import sys
+import re
+import setuptools
+from setuptools import setup
+
+
 descr = """TrendVis (a.k.a. `trendvis`): Complex plotting in matplotlib.
 
 This package is designed to programmatically create complex, publication-
@@ -7,8 +14,8 @@ quality figures using matplotlib.  TrendVis' speciality is creating
 multiple vertically or horizontally offset plots with a
 common x or y axis, respectively, in what is visually one compact
 plotting area, facilitating comparisons among various datasets.
-
 """
+
 
 DISTNAME            = 'TrendVis'
 DESCRIPTION         = 'Publication-quality data trend visualization'
@@ -20,17 +27,6 @@ DOWNLOAD_URL        = ''
 VERSION             = '0.2.2'
 PYTHON_VERSION      = (2, 6)
 DEPENDENCIES        = {'matplotlib': (1, 2)}
-
-
-import os
-import sys
-import re
-import setuptools
-from numpy.distutils.core import setup
-try:
-    from distutils.command.build_py import build_py_2to3 as build_py
-except ImportError:
-    from distutils.command.build_py import build_py
 
 
 def check_requirements():
