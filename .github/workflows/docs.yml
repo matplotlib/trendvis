@@ -14,11 +14,11 @@ jobs:
       - name: Install mpl-gui
         run: python -m pip install -v .
       - name: Build
-        run: make -Cdocs html
+        run: make -Cdoc html
       - name: Publish
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
+          publish_dir: ./doc/build/html
           force_orphan: true
