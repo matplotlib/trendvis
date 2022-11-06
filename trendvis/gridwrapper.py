@@ -75,12 +75,12 @@ def make_grid(xratios, yratios, figsize, xticks, yticks, main_axis,
 
     startside = startside_dict[mainax]
 
-    if mainax is 'y':
+    if mainax == 'y':
         # Set up grid, grid formatting
         grid = XGrid(xratios, yratios, figsize, startside=startside,
                      alternate_sides=True, onespine_forboth=False)
 
-    elif mainax is 'x':
+    elif mainax == 'x':
         grid = YGrid(xratios, yratios, figsize, startside=startside,
                      alternate_sides=True, onespine_forboth=False)
 

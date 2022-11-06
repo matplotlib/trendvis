@@ -325,9 +325,9 @@ class YGrid(Grid):
         for col, xt, xsc in zip(self.axes, xticks, xscale):
             for ax, yt, ysc in zip(col, yticks, yscale):
 
-                if yt is not None or ysc is 'log':
+                if yt is not None or ysc == 'log':
                     self.set_yaxis_ticknum(ax, yt, scale=ysc)
-                if xt is not None or xsc is 'log':
+                if xt is not None or xsc == 'log':
                     self.set_xaxis_ticknum(ax, xt, scale=xsc)
 
     def ticknum_format(self, ax='all', xformatter='%d', yformatter='%d'):
@@ -352,7 +352,7 @@ class YGrid(Grid):
 
         """
 
-        if ax is not 'all':
+        if ax != 'all':
             if xformatter is not None:
                 xfrmttr = FormatStrFormatter(xformatter)
                 ax.xaxis.set_major_formatter(xfrmttr)
@@ -396,7 +396,7 @@ class YGrid(Grid):
 
         """
 
-        if reverse_y is 'all':
+        if reverse_y == 'all':
             reverse_y = range(0, self.mainax_dim)
 
         # Invert y axis of each axis in the first column
@@ -422,7 +422,7 @@ class YGrid(Grid):
 
         """
 
-        if reverse_x is 'all':
+        if reverse_x == 'all':
             reverse_x = range(0, self.total_stackdim)
 
         # Invert x axis of first axis in each column
@@ -552,16 +552,16 @@ class YGrid(Grid):
 
         """
 
-        if row is 'all':
+        if row == 'all':
             row = range(0, self.mainax_dim)
-        if column is 'all':
+        if column == 'all':
             column = range(0, self.total_stackdim)
 
-        if which is not 'major':
+        if which != 'major':
             Grid._set_ticks(self, column, row, xy_axis, 'minor', minor_dim,
                             labelsize, pad, minor_tickdir)
 
-        if which is not 'minor':
+        if which != 'minor':
             Grid._set_ticks(self, column, row, xy_axis, 'major', major_dim,
                             labelsize, pad, major_tickdir)
 
@@ -600,7 +600,7 @@ class YGrid(Grid):
 
             right_ind = self.stackdim - 1
 
-            if lw is 'default':
+            if lw == 'default':
                 lw = self.spinewidth
 
             l_ax = self.axes[0][0]
