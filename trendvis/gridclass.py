@@ -186,7 +186,7 @@ class Grid(object):
         # Position list in the case of a stack of 1
         if self.stackdim == 1:
             if onespine_forboth:
-                if self.mainax_id is 'x':
+                if self.mainax_id == 'x':
                     self.startpos = 'bottom'
                 self.stackpos_list = [self.startpos]
             else:
@@ -396,7 +396,7 @@ class Grid(object):
 
         ax.spines[which].set_visible(visible)
 
-        if which is 'left' or which is 'right':
+        if which == 'left' or which == 'right':
             if visible:
                 ytick_dict = {'both'   : {'left' : 'both',
                                           'right': 'both'},
@@ -432,7 +432,7 @@ class Grid(object):
             ax.yaxis.set_tick_params(labelright=r, labelleft=f)
             self.grid_isclean = False
 
-        if which is 'top' or which is 'bottom':
+        if which == 'top' or which == 'bottom':
             if visible:
                 xtick_dict = {'both'   : {'top'   : 'both',
                                           'bottom': 'both'},
@@ -522,7 +522,7 @@ class Grid(object):
 
         """
 
-        if scale is 'linear':
+        if scale == 'linear':
 
             xmajor_loc = MultipleLocator(xticks[0])
             xminor_loc = MultipleLocator(xticks[1])
@@ -549,7 +549,7 @@ class Grid(object):
 
         """
 
-        if scale is 'linear':
+        if scale == 'linear':
             ymajor_loc = MultipleLocator(yticks[0])
             yminor_loc = MultipleLocator(yticks[1])
 
@@ -660,11 +660,11 @@ class Grid(object):
         last_instack = self.stackdim - 1
         patchlist = self.fig.patches
 
-        if lw is 'default':
+        if lw == 'default':
             lw = self.spinewidth
 
         for main in range(0, self.mainax_dim):
-            if self.mainax_id is 'x':
+            if self.mainax_id == 'x':
                 ll_axis = self.axes[last_instack][main]
                 ur_axis = self.axes[0][main]
             else:
@@ -724,7 +724,7 @@ class Grid(object):
 
         """
 
-        if orientation is 'vertical':
+        if orientation == 'vertical':
             lldx, urdx = bar_limits
             lldy = ll_axis.get_ylim()[0]
             urdy = ur_axis.get_ylim()[1]
@@ -866,9 +866,9 @@ class Grid(object):
 
         """
 
-        if item is 'none':
+        if item == 'none':
             itemlist = [choice1] * dim
-        elif item is 'all':
+        elif item == 'all':
             itemlist = [choice2] * dim
         else:
             itemlist = []

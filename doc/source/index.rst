@@ -1,16 +1,11 @@
 .. currentmodule:: trendvis
 
-====================
+==========
  TrendVis
-====================
-
-.. htmlonly::
-
-    :Release: |version|
-    :Date: |today|
+==========
 
 :py:mod:`trendvis` API
-====================
+======================
 
 .. autosummary::
    :toctree: generated/
@@ -87,9 +82,9 @@ Creating a `YGrid` is essentially the same as an `XGrid`.
    nums = 10
    lw = 1.5
 
-   ex0 = YGrid([1,2,1], figsize=(5,5))
+   ex0 = trendvis.YGrid([1,2,1], figsize=(5,5))
 
-   plot_data(ex0, [[(xvals, np.linspace(0, 9.5, num=nums), 'blue')],
+   trendvis.plot_data(ex0, [[(xvals, np.linspace(0, 9.5, num=nums), 'blue')],
                    [(xvals*5, np.linspace(1, 9, num=nums),  'red')],
                    [(xvals*10, np.linspace(0.5, 10, num=nums),'green')]],
              lw=1.5, auto_spinecolor=True, markeredgecolor='none', marker='s')
@@ -104,4 +99,3 @@ Creating a `YGrid` is essentially the same as an `XGrid`.
    ex0.axes[0][0].set_ylabel('Main Axis', fontsize=14)
 
    ex0.fig.subplots_adjust(wspace=-0.3)
-

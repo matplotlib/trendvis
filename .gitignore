@@ -1,1 +1,7 @@
 *.pyc
+*egg-info
+trendvis/version.py
+result_images
+*~
+doc/build
+doc/source/generated
